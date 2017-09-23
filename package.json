@@ -9,7 +9,7 @@
     "colors": "^1.1.2",
     "express": "^4.15.4",
     "json-query": "^2.2.2",
-    "origami-core-server": "^0.0.1-dev.1"
+    "origami-core-server-errors": "dev"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.0",
