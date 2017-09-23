@@ -1,0 +1,19 @@
+{
+  "name": "origami-core-server",
+  "version": "0.0.1-dev.1",
+  "description": "Core server for Origami CMS",
+  "main": "index.js",
+  "author": "Tristan Matthias <hello@tristanmathias.com>",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "express": "^4.15.4",
+    "json-query": "^2.2.2",
+    "origami-core-server": "^0.0.1-dev.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.0.0",
+    "eslint": "^4.7.2",
+    "eslint-plugin-prefer-object-spread": "^1.2.1"
+  }
+}
