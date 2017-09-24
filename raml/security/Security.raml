@@ -1,0 +1,14 @@
+#%RAML 1.0 Library
+securitySchemes:
+  JWT:
+    type: x-{other}
+    describedBy:
+      headers:
+        Authorization:
+          description: X-AuthToken
+          type: string
+          required: true
+      responses:
+        401:
+          description: Authentication problem (JWT not set or invalid)
+

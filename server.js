@@ -30,11 +30,6 @@ module.exports = class Server {
 
         app.set('ln', this[s.options].ln);
 
-
-        this[s.app].use(require('./middleware/format'));
-        this[s.app].use(require('./middleware/auth'));
-        app.use('/', (req, res) => res.send('ok'));
-
         this.serve();
     }
 
@@ -46,7 +41,14 @@ module.exports = class Server {
     }
 
 
-    [s.setupMiddleware]() {
-        this[s.app].use(require('./middleware/errors'));
+    async [s.setupMiddleware]() {
+        this[s.app].use('/api/v1',
+            await require('./middleware/raml')()
+        );
+        this[s.app].use('/api/v1',
+            await require('./controllers')()
+        );
+        this[s.app].use(await require('./middleware/errors')());
+        this[s.app].use(await require('./middleware/format')());
     }
 };
