@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const {symbols} = require('../lib');
+const {symbols} = require('origami-core-lib');
 
 const s = symbols(['raml', 'namespace', 'buildRoutes']);
 
@@ -40,15 +40,18 @@ module.exports = class Controller {
         let overrideMethods = {};
 
         // Use default methods from this controller class
-        this[s.raml].methods.reduce((_methods, m) => {
-            methods[m.method] = this[m.method].bind(this);
-        }, methods);
+        if (this[s.raml].methods) {
+            this[s.raml].methods.reduce((_methods, m) => {
+                methods[m.method] = this[m.method].bind(this);
+            }, methods);
+        }
 
 
         // Override any methods from the file system
         try {
             overrideMethods = require(path.join(__dirname, this[s.raml].absoluteUri));
         } catch (e) {
+            // console.log(e);
             // No override methods present
         }
 
@@ -61,12 +64,17 @@ module.exports = class Controller {
 
         // Register the methods to the router
         Object.entries(methods).forEach(([m, func]) => {
+            console.log(m, this.url);
             this.router[m](this.url, func);
         });
     }
 
     async get(req, res, next) {
         res.data = {a: 1};
+        await next();
+    }
+
+    async post(req, res, next) {
         await next();
     }
 };

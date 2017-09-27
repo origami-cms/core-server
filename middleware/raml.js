@@ -11,7 +11,6 @@ const OSPREY_CONFIG = {
 
 module.exports = async() => {
     const middleware = await osprey.loadFile(RAML_PATH, OSPREY_CONFIG);
-    console.log(middleware.ramlUriParameters);
 
     return (req, res, next) => {
         middleware(req, res, async err => {

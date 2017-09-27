@@ -6,12 +6,15 @@
   "author": "Tristan Matthias <hello@tristanmathias.com>",
   "license": "MIT",
   "scripts": {
-      "lint": "eslint ./"
+    "lint": "eslint ./"
   },
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "colors": "^1.1.2",
     "express": "^4.15.4",
     "json-query": "^2.2.2",
+    "jsonwebtoken": "^8.0.1",
+    "origami-core-lib": "^0.0.1",
     "origami-core-server-errors": "dev",
     "osprey": "^0.4.1",
     "raml2obj": "^5.5.0"

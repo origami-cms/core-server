@@ -1,0 +1,7 @@
+{
+    "statusCode": 200,
+    "data": {
+        "token": "fyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzZWJkNjRlMS04ODMwLTQ3ZjktOTJiYy1mMzZiNGNlZjBmYjYiLCJlbWFpbCI6InRyaXN0YW5Ab3JpZ2FtaWNtcy5jb20iLCJpYXQiOjE1MDY1MTI3ODYsImV4cCI6MTUwNjUxNDU4Nn0.k_gxaq5uYlbg8m6bLlBqSO4HelmwDx4jxMPknGnw34E",
+        "expires": 1506512786
+    }
+}

@@ -1,20 +1,34 @@
 const express = require('express');
+const path = require('path');
+const fs = require('fs');
 require('colors');
-const {symbols, requireKeys} = require('./lib');
+const {symbols, requireKeys} = require('origami-core-lib');
+const Options = require('./Options');
 
 // Private symbols
-const s = symbols(['app', 'options', 'setupMiddleware']);
+const s = symbols([
+    // Props
+    'app',
+    'options',
+    'store',
+    // Methods
+    'setup',
+    'setupStore',
+    'setupMiddleware'
+]);
 
 
 const DEFAULT_PORT = 8080;
 
 
 module.exports = class Server {
-    constructor(options) {
+    constructor(options, store) {
         const app = this[s.app] = express();
+        this[s.store] = store;
 
 
-        this[s.options] = {...{
+        // Assign these to a singleton class so they can be use across the server
+        Options.options = this[s.options] = {...{
             port: process.env.NODE_ENV || DEFAULT_PORT,
             ln: 'enUS'
         }, ...options};
@@ -27,25 +41,43 @@ module.exports = class Server {
             throw new Error(`Origami.Server: Missing '${e.key}' setting`);
         }
 
+        this[s.setup]();
+
 
         app.set('ln', this[s.options].ln);
-
-        this.serve();
     }
 
 
     serve() {
-        this[s.setupMiddleware]();
         this[s.app].listen(this[s.options].port);
-        console.log('Origami server listening on port %d', this[s.options].port);
+        console.log('Origami.Server: Listening on port %d', this[s.options].port);
+    }
+
+
+    async [s.setup]() {
+        await this[s.setupStore]();
+        await this[s.setupMiddleware]();
+        this.serve();
+    }
+
+
+    [s.setupStore]() {
+        const store = this[s.store];
+        fs
+            .readdirSync(path.resolve(__dirname, './models'))
+            .filter(f => (/.*\.js$/).test(f))
+            .forEach(f => store.model(
+                f.split('.')[0],
+                require(`./models/${f}`)
+            ));
+
+        this[s.app].set('store', store);
     }
 
 
     async [s.setupMiddleware]() {
         this[s.app].use('/api/v1',
-            await require('./middleware/raml')()
-        );
-        this[s.app].use('/api/v1',
+            await require('./middleware/raml')(),
             await require('./controllers')()
         );
         this[s.app].use(await require('./middleware/errors')());

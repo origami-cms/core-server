@@ -12,6 +12,7 @@ module.exports = () =>
             // Destructure the code and message from an array
             // EG: notFound: ['No resource found', 404]
             if (message instanceof Array) [message, code] = message;
+            if (!message) message = 'Unknown error';
 
             res.status(code);
             res.text = message;
