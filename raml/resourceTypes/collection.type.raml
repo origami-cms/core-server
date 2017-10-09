@@ -1,0 +1,10 @@
+#%RAML 1.0 ResourceType
+
+usage: Apply this resource type to any resource that returns a collection.
+
+securedBy: JWT
+
+get:
+  description: Returns a collection of <<resourcePathName>>
+post:
+  description: Requests the creation of a new <<resourcePathName | !singularize>>

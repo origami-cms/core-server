@@ -15,8 +15,9 @@
     "json-query": "^2.2.2",
     "jsonwebtoken": "^8.0.1",
     "origami-core-lib": "^0.0.1",
-    "origami-core-server-errors": "dev",
+    "origami-core-server-statuses": "0.0.2",
     "osprey": "^0.4.1",
+    "pluralize": "^7.0.0",
     "raml2obj": "^5.5.0"
   },
   "devDependencies": {

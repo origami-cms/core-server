@@ -1,17 +1,34 @@
 const express = require('express');
 const path = require('path');
 const {symbols} = require('origami-core-lib');
+const pluralize = require('pluralize');
+const mwAuth = require('../middleware/auth');
+const mwFormat = require('../middleware/formatRamlResponse');
 
-const s = symbols(['raml', 'namespace', 'buildRoutes']);
+const s = symbols([
+    // Properties
+    'raml',
+    // Methods
+    'buildRoutes',
+    'getModel'
+]);
 
 module.exports = class Controller {
-    constructor(ramlObj, namespace = '') {
+    constructor(ramlObj) {
         this[s.raml] = ramlObj;
-        this[s.namespace] = namespace;
 
         this.router = new express.Router();
 
+
+        // Authenticate the route if it has `securedBy` property
+        const [auth] = this[s.raml].securedBy || [];
+        if (auth) {
+            if (auth.schemeName === 'JWT') this.router.use(mwAuth);
+        }
+
+
         this[s.buildRoutes]();
+
 
         if (ramlObj.resources) {
             ramlObj.resources.forEach(r => {
@@ -26,7 +43,24 @@ module.exports = class Controller {
      * @return {String} Build from RAML
      */
     get url() {
-        return this[s.namespace] + this[s.raml].relativeUri;
+        if (!this[s.raml].parentUrl) return '/';
+        else return this[s.raml].relativeUri;
+    }
+
+    /**
+     * Singular name of the resource
+     * @return {String} Build from RAML
+     */
+    get name() {
+        return pluralize.singular(this[s.raml].displayName.slice(1));
+    }
+
+    /**
+     * Singular name of the parent resource
+     * @return {String} Build from RAML
+     */
+    get parentName() {
+        return pluralize.singular(this[s.raml].parentUrl.slice(1));
     }
 
 
@@ -51,7 +85,6 @@ module.exports = class Controller {
         try {
             overrideMethods = require(path.join(__dirname, this[s.raml].absoluteUri));
         } catch (e) {
-            // console.log(e);
             // No override methods present
         }
 
@@ -61,20 +94,73 @@ module.exports = class Controller {
         });
         await Promise.all(run);
 
-
         // Register the methods to the router
         Object.entries(methods).forEach(([m, func]) => {
-            console.log(m, this.url);
-            this.router[m](this.url, func);
+            console.log(m.magenta, this.url.yellow);
+            this.router[m](this.url, func, mwFormat(this[s.raml]));
         });
     }
 
-    async get(req, res, next) {
-        res.data = {a: 1};
-        await next();
+
+    async [s.getModel](req, res) {
+        const resourceId = req.params[`${this.parentName}Id`];
+        const modelName = resourceId ? this.parentName : this.name;
+        const model = await res.app.get('store').model(modelName);
+
+        return {resourceId, model, modelName};
     }
 
+
+    async get(req, res, next) {
+        let model;
+        let resourceId;
+        let modelName;
+
+        try {
+            ({model, resourceId, modelName} = await this[s.getModel](req, res));
+        } catch (e) {
+            if (next) return next(e);
+            else throw e;
+        }
+
+        const filter = resourceId ? {id: resourceId} : null;
+        const data = await model.find(filter);
+
+        // If getting a single resource, and there is none, 404
+        if (!data && resourceId) return next(new Error(`${modelName}.errors.notFound`));
+
+        res.data = data;
+        res.responseCode = `${modelName}.success.${resourceId ? 'getOne' : 'getList'}`;
+        if (next) await next();
+    }
+
+
     async post(req, res, next) {
-        await next();
+        try {
+            const {model, modelName} = await this[s.getModel](req, res);
+            res.data = await model.create(req.body);
+            res.responseCode = `${modelName}.success.create`;
+        } catch (e) {
+            if (next) await next(e);
+            else throw e;
+        }
+        if (next) await next();
+    }
+
+
+    async put(req, res, next) {
+        try {
+            const {model, resourceId, modelName} = await this[s.getModel](req, res);
+        } catch (e) {
+            if (next) return next(e);
+            else throw e;
+        }
+        res.data = await model.update(resourceId, req.body);
+        if (next) await next();
+    }
+
+
+    async delete(req, res, next) {
+        if (next) await next();
     }
 };

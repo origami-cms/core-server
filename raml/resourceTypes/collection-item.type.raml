@@ -1,0 +1,12 @@
+#%RAML 1.0 ResourceType
+
+usage: Apply this resource type to any resource that returns a collection.
+
+securedBy: JWT
+
+get:
+  description: Returns an instance of <<resourcePathName | !singularize>>
+put:
+  description: Updates the <<resourcePathName | !singularize>> instance
+delete:
+  description: Deletes the <<resourcePathName | !singularize>> instance

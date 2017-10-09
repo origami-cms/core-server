@@ -1,21 +1,19 @@
-const errors = require('origami-core-server-errors');
-const query = require('json-query');
 require('colors');
+const status = require('../lib/status');
 
 module.exports = () =>
     async(err, req, res, next) => {
+        const errCode = 500;
         if (err) {
-            const ln = errors(res.app.get('ln'));
-            let message = query(err.message, {data: ln}).value;
-            let code = 500;
+            const message = status(res, err.message, errCode);
+            if (!res.data && err.data) res.data = err.data;
 
-            // Destructure the code and message from an array
-            // EG: notFound: ['No resource found', 404]
-            if (message instanceof Array) [message, code] = message;
-            if (!message) message = 'Unknown error';
+            if (res.statusCode === errCode) {
+                if (process.env.NODE_ENV != 'production') {
+                    res.data = err.stack.split('\n');
+                } else delete res.data;
+            }
 
-            res.status(code);
-            res.text = message;
             console.log(`${new Date().toISOString().red} ❌`, req.url.yellow, message.red);
         }
         await next();

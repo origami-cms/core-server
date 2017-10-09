@@ -11,11 +11,11 @@ module.exports.post = () =>
 
         // Find the user
         const [user] = await model.find({email: req.body.email});
-        if (!user) return next(new Error('auth.noUser'));
+        if (!user) return next(new Error('auth.errors.noUser'));
 
         // Compare password
         if (!await bcrypt.compare(req.body.password, user.password)) {
-            return next(new Error('auth.noUser'));
+            return next(new Error('auth.errors.noUser'));
         }
 
         // If successful, sign JWT

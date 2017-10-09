@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const bodyParser = require('body-parser');
 require('colors');
 const {symbols, requireKeys} = require('origami-core-lib');
 const Options = require('./Options');
@@ -76,6 +77,7 @@ module.exports = class Server {
 
 
     async [s.setupMiddleware]() {
+        this[s.app].use(bodyParser());
         this[s.app].use('/api/v1',
             await require('./middleware/raml')(),
             await require('./controllers')()

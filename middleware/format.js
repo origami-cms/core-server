@@ -1,8 +1,12 @@
+const status = require('../lib/status');
+
 module.exports = () =>
     async(req, res, next) => {
         await next();
 
         const isAPI = req.path.indexOf('/api/') === 0;
+
+        if (res.responseCode) status(res, res.responseCode, 200);
 
         if (res.text || res.data) {
             const returning = {

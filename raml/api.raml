@@ -3,6 +3,17 @@ title: Origami
 version: 1
 baseUri: /api/v1/
 
+# types:
+#   UserPost: !include routes/user/shapes.raml
+uses:
+  user: routes/user/types.raml
+
+resourceTypes:
+  collection: !include resourceTypes/collection.type.raml
+  collection-item: !include resourceTypes/collection-item.type.raml
+
+
+
 securitySchemes:
   JWT:
     type: x-{other}
@@ -37,3 +48,33 @@ securitySchemes:
                         "expires": 1506512786
                     }
                 }
+
+
+/users:
+  type: collection
+  post:
+    body:
+      application/json:
+        type: user.Create
+    responses:
+      201:
+        body:
+          application/json: !include routes/user/responses/post.201.json
+
+  /:userId:
+    type: collection-item
+    get:
+      responses:
+        200:
+          body:
+            application/json: !include routes/user/responses/get.200.json
+
+
+/themes:
+  get:
+  /installed:
+    get:
+  /install:
+    post:
+  /activate/:themeName:
+    post:

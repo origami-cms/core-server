@@ -9,14 +9,10 @@ module.exports = async() => {
     const router = new express.Router();
     const raml = await raml2obj(RAML_PATH);
 
-    const buildResources = (r, obj) => {
-        obj.resources.forEach(res => {
-            const c = new Controller(res);
-            r.use(c.router);
-        });
-    };
-
-    buildResources(router, raml);
+    raml.resources.forEach(res => {
+        const c = new Controller(res);
+        router.use(res.relativeUri, c.router);
+    });
 
     return router;
 };
