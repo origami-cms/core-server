@@ -80,7 +80,10 @@ module.exports = class Server {
         this[s.app].use(bodyParser());
         this[s.app].use('/api/v1',
             await require('./middleware/raml')(),
-            await require('./controllers')()
+            await require('./controllers/api')(),
+        );
+        this[s.app].use(
+            await require('./controllers/theme')()
         );
         this[s.app].use(await require('./middleware/errors')());
         this[s.app].use(await require('./middleware/format')());

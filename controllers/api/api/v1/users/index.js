@@ -1,4 +1,4 @@
-const auth = require('../../../../lib/auth');
+const auth = require('../../../../../lib/auth');
 
 module.exports.post = controller => {
     return async(req, res, next) => {

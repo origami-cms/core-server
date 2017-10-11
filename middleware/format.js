@@ -25,7 +25,8 @@ module.exports = () =>
             });
 
 
-        } else {
+        } else if (!res.body) {
             res.send('Not found');
-        }
+
+        } else res.send(res.body);
     };

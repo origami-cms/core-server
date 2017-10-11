@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
-const auth = require('../../../../lib/auth');
-
+const auth = require('../../../../../lib/auth');
 /*
  * Validates the email and password of a user, then returns a JWT token, and
  * it's expiry.

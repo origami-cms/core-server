@@ -2,8 +2,8 @@ const express = require('express');
 const path = require('path');
 const {symbols} = require('origami-core-lib');
 const pluralize = require('pluralize');
-const mwAuth = require('../middleware/auth');
-const mwFormat = require('../middleware/formatRamlResponse');
+const mwAuth = require('../../middleware/auth');
+const mwFormat = require('../../middleware/formatRamlResponse');
 
 const s = symbols([
     // Properties
@@ -85,9 +85,9 @@ module.exports = class Controller {
         try {
             overrideMethods = require(path.join(__dirname, this[s.raml].absoluteUri));
         } catch (e) {
+            // console.log(e);
             // No override methods present
         }
-
         // Run the overrides
         const run = Object.entries(overrideMethods).map(async([method, func]) => {
             methods[method] = await func(this);
@@ -96,7 +96,8 @@ module.exports = class Controller {
 
         // Register the methods to the router
         Object.entries(methods).forEach(([m, func]) => {
-            console.log(m.magenta, this.url.yellow);
+            const _m = `     ${m}`.slice(-1 * 'DELETE'.length);
+            console.log(' '.repeat(2), _m.toUpperCase().magenta, this[s.raml].absoluteUri.yellow);
             this.router[m](this.url, func, mwFormat(this[s.raml]));
         });
     }
