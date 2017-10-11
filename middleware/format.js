@@ -1,4 +1,5 @@
 const status = require('../lib/status');
+const http = require('http-status-codes');
 
 module.exports = () =>
     async(req, res, next) => {
@@ -6,7 +7,7 @@ module.exports = () =>
 
         const isAPI = req.path.indexOf('/api/') === 0;
 
-        if (res.responseCode) status(res, res.responseCode, 200);
+        if (res.responseCode) status(res, res.responseCode, http.OK);
 
         if (res.text || res.data) {
             const returning = {
@@ -19,7 +20,7 @@ module.exports = () =>
 
 
         } else if (isAPI) {
-            return res.status(404).send({
+            return res.status(http.NOT_FOUND).send({
                 statusCode: res.statusCode,
                 message: 'Not found'
             });

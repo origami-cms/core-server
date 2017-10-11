@@ -1,42 +1,28 @@
-const fs = require('fs');
-const path = require('path');
-const util = require('util');
-const _ = require('lodash');
 const {Router} = require('express');
 
-module.exports = new class Theme {
+const theme = require('../../lib/theme/Theme');
+
+
+module.exports = new class ThemeController {
     constructor() {
-        this.config = {};
-        this.themeName = 'snow';
-        this.load();
         this.router = new Router();
         this.router.use(
             this.middlewareExistingResponse.bind(this)
         );
     }
 
-    get themePath() {
-        return path.resolve(
-            process.cwd(),
-            'node_modules',
-            `origami-theme-${this.themeName}`
-        );
-    }
-
-    load() {
-        this.config = require(path.resolve(this.themePath, 'theme.json'));
-
-        this.config.paths = _.mapValues(this.config.paths, v =>
-            path.resolve(this.themePath, v)
-        );
-    }
-
-    middlewareExistingResponse(req, res, next) {
+    // If the request is already handled, leave it, otherwise pass on to
+    // rendering
+    async middlewareExistingResponse(req, res, next) {
         if (res.data || res.error) return next();
-        else this.middleware(...arguments);
+        try {
+            console.time('Time:Render'.cyan);
+            res.body = await theme.render(req.path, require('./sampleData'));
+            console.timeEnd('Time:Render'.cyan);
+            next();
+        } catch (e) {
+            next(e);
+        }
     }
-    middleware(req, res, next) {
-        res.body = 'AWESOME!';
-        next();
-    }
+
 }();

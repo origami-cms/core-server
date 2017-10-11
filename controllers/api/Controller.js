@@ -85,7 +85,7 @@ module.exports = class Controller {
         try {
             overrideMethods = require(path.join(__dirname, this[s.raml].absoluteUri));
         } catch (e) {
-            // console.log(e);
+            // Console.log(e);
             // No override methods present
         }
         // Run the overrides
@@ -151,12 +151,12 @@ module.exports = class Controller {
 
     async put(req, res, next) {
         try {
-            const {model, resourceId, modelName} = await this[s.getModel](req, res);
+            // Const {model, resourceId, modelName} = await this[s.getModel](req, res);
         } catch (e) {
             if (next) return next(e);
             else throw e;
         }
-        res.data = await model.update(resourceId, req.body);
+        // Res.data = await model.update(resourceId, req.body);
         if (next) await next();
     }
 

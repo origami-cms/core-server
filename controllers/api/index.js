@@ -9,10 +9,16 @@ module.exports = async() => {
     const router = new express.Router();
     const raml = await raml2obj(RAML_PATH);
 
+
     console.log('Routes'.green);
     raml.resources.forEach(res => {
         const c = new Controller(res);
         router.use(res.relativeUri, c.router);
+    });
+
+    router.use((req, res, next) => {
+        if (!res.data) next(new Error('general.errors.notFound'));
+        else next();
     });
 
     return router;
