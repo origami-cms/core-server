@@ -97,7 +97,7 @@ module.exports = class Controller {
         // Register the methods to the router
         Object.entries(methods).forEach(([m, func]) => {
             const _m = `     ${m}`.slice(-1 * 'DELETE'.length);
-            console.log(' '.repeat(2), _m.toUpperCase().magenta, this[s.raml].absoluteUri.yellow);
+            console.log(' '.repeat(2), _m.toUpperCase().grey, this[s.raml].absoluteUri.magenta);
             this.router[m](this.url, func, mwFormat(this[s.raml]));
         });
     }

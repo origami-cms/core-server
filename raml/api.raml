@@ -69,6 +69,10 @@ securitySchemes:
           body:
             application/json: !include routes/user/responses/get.200.json
 
+/pages:
+  type: collection
+  /:pageId:
+    type: collection-item
 
 /themes:
   get:

@@ -15,13 +15,17 @@ module.exports = async() => {
     return (req, res, next) => {
         middleware(req, res, async err => {
             if (err) {
-                res.data = err.requestErrors.map(e => ({
-                    type: e.type,
-                    field: e.dataPath,
-                    rule: e.keyword,
-                    expected: e.schema
-                }));
-                await next(new Error('request.invalid'));
+                try {
+                    res.data = err.requestErrors.map(e => ({
+                        type: e.type,
+                        field: e.dataPath,
+                        rule: e.keyword,
+                        expected: e.schema
+                    }));
+                    await next(new Error('request.invalid'));
+                } catch (e) {
+                    next(e)
+                }
             } else await next();
         });
     };

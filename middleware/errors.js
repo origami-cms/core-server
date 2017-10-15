@@ -14,7 +14,7 @@ module.exports = () =>
                 } else delete res.data;
             }
 
-            console.log(`${new Date().toISOString().red} ❌`, req.url.yellow, message.red);
+            console.log(`${new Date().toISOString().red} ❌`, req.method.yellow, req.url.yellow, message.red);
         }
         await next();
     };

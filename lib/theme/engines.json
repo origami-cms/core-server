@@ -22,5 +22,10 @@
     "emblem": false,
     "closure": false,
     "json2html": false,
-    "mustache": false
+    "mustache": false,
+
+
+
+    "scss": "sass-css-stream",
+    "sass": "sass-css-stream"
 }

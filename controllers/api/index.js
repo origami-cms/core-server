@@ -10,7 +10,7 @@ module.exports = async() => {
     const raml = await raml2obj(RAML_PATH);
 
 
-    console.log('Routes'.green);
+    console.log('ℹ️ Origami.APIController: Routes'.magenta);
     raml.resources.forEach(res => {
         const c = new Controller(res);
         router.use(res.relativeUri, c.router);

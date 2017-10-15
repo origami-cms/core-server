@@ -12,6 +12,7 @@ const s = symbols([
     'app',
     'options',
     'store',
+    'admin',
     // Methods
     'setup',
     'setupStore',
@@ -23,9 +24,10 @@ const DEFAULT_PORT = 8080;
 
 
 module.exports = class Server {
-    constructor(options, store) {
+    constructor(options, store, admin) {
         const app = this[s.app] = express();
         this[s.store] = store;
+        this[s.admin] = admin;
 
 
         // Assign these to a singleton class so they can be use across the server
@@ -78,10 +80,16 @@ module.exports = class Server {
 
     async [s.setupMiddleware]() {
         this[s.app].use(bodyParser());
+
+        // Setup admin UI
+        this[s.app].use('/admin/', this[s.admin]());
+
+        // Setup API
         this[s.app].use('/api/v1',
             await require('./middleware/raml')(),
             await require('./controllers/api')(),
         );
+        // Setup theme
         this[s.app].use(
             await require('./controllers/theme')()
         );
