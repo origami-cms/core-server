@@ -24,7 +24,7 @@ module.exports = async() => {
                     }));
                     await next(new Error('request.invalid'));
                 } catch (e) {
-                    next(e)
+                    next(err)
                 }
             } else await next();
         });
