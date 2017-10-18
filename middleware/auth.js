@@ -13,6 +13,7 @@ module.exports = async(req, res, next) => {
             if (e.name === 'TokenExpiredError') throw new Error('auth.errors.expired');
             throw e;
         }
+        req.jwt = jwt;
         await next();
     } catch (e) {
         await next(e);

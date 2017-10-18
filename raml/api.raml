@@ -48,7 +48,12 @@ securitySchemes:
                         "expires": 1506512786
                     }
                 }
-
+  /verify:
+    securedBy: JWT
+    get:
+  /refresh:
+    securedBy: JWT
+    post:
 
 /users:
   type: collection
