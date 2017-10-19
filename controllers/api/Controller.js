@@ -23,7 +23,7 @@ module.exports = class Controller {
         // Authenticate the route if it has `securedBy` property
         const [auth] = this[s.raml].securedBy || [];
         if (auth) {
-            if (auth.schemeName === 'JWT') this.router.use(mwAuth);
+            if (auth.schemeName === 'JWT') this.router.use(this.url, mwAuth);
         }
 
 
