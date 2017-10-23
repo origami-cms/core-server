@@ -85,7 +85,7 @@ module.exports = class Controller {
         try {
             overrideMethods = require(path.join(__dirname, this[s.raml].absoluteUri));
         } catch (e) {
-            // Console.log(e);
+            // console.log(e);
             // No override methods present
         }
         // Run the overrides

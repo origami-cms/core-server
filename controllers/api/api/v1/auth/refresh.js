@@ -6,7 +6,7 @@ const auth = require('../../../../../lib/auth');
  */
 module.exports.post = () =>
     async(req, res, next) => {
-        const existing = auth.jwtVerify(req.jwt);
+        const existing = auth.jwtVerify(req.jwt.token);
         delete existing.iat;
         delete existing.exp;
 

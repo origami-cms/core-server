@@ -6,14 +6,18 @@ module.exports = async(req, res, next) => {
         const jwtRegex = /Bearer\s(.+)/;
         if (!jwtRegex.test(head)) throw new Error('auth.errors.invalidHead');
         const [, jwt] = jwtRegex.exec(head);
+        let data;
         try {
-            auth.jwtVerify(jwt);
+            data = auth.jwtVerify(jwt);
         } catch (e) {
             if (e.name === 'JsonWebTokenError') throw new Error('auth.errors.invalidJWT');
             if (e.name === 'TokenExpiredError') throw new Error('auth.errors.expired');
             throw e;
         }
-        req.jwt = jwt;
+        req.jwt = {
+            token: jwt,
+            data
+        };
         await next();
     } catch (e) {
         await next(e);
