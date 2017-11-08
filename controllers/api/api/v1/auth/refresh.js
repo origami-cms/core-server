@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt');
 const auth = require('../../../../../lib/auth');
 
 /*

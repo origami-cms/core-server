@@ -5,6 +5,6 @@ module.exports.get = controller => async(req, res, next) => {
         });
         next();
     } else {
-        controller.get(req, res, next);
+        await controller.get(req, res, next);
     }
-}
+};

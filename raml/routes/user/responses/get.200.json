@@ -2,7 +2,8 @@
   "statusCode": 200,
   "data": {
     "id": "3ebd64e1-8830-47f9-92bc-f36b4cef0fb6",
-    "fname": "Tristan3",
-    "email": "tristan@origamicms.com"
+    "fname": "First name",
+    "lname": "Last Name",
+    "email": "name@origamicms.com"
   }
 }

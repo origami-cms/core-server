@@ -1,6 +1,3 @@
-const bcrypt = require('bcrypt');
-const auth = require('../../../../../lib/auth');
-
 /*
  * Validates the JWT token
  * it's expiry.

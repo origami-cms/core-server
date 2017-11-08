@@ -76,8 +76,13 @@ securitySchemes:
 
 /pages:
   type: collection
+  /types:
+    get:
   /:pageId:
     type: collection-item
+    /properties:
+      get:
+      put:
 
 /templates:
   type: collection
@@ -92,3 +97,11 @@ securitySchemes:
     post:
   /activate/:themeName:
     post:
+
+/settings:
+  get:
+  post:
+  /:setting:
+    get:
+    delete:
+    put:

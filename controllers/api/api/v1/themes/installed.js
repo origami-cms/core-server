@@ -2,6 +2,7 @@ const npm = require('../../../../../lib/npm');
 
 module.exports.get = () =>
     async(req, res, next) => {
+        console.log('GETTING THEMES');
         const t = await Promise.all([
             // Get list of packages
             npm.list('theme'),

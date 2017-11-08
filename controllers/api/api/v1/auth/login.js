@@ -7,25 +7,29 @@ const auth = require('../../../../../lib/auth');
  */
 module.exports.post = () =>
     async(req, res, next) => {
-        const model = await res.app.get('store').model('user');
+        try {
+            const model = await res.app.get('store').model('user');
 
-        // Find the user
-        const [user] = await model.find({email: req.body.email});
-        if (!user) return next(new Error('auth.errors.noUser'));
+            // Find the user
+            const [user] = await model.find({email: req.body.email}, {hidden: true});
+            if (!user) return next(new Error('auth.errors.noUser'));
 
-        // Compare password
-        if (!await bcrypt.compare(req.body.password, user.password)) {
-            return next(new Error('auth.errors.noUser'));
+            // Compare password
+            if (!await bcrypt.compare(req.body.password, user.password)) {
+                return next(new Error('auth.errors.noUser'));
+            }
+
+            // If successful, sign JWT
+            const token = auth.jwtSign({
+                userId: user.id,
+                email: user.email
+            });
+            const {iat: expires} = auth.jwtVerify(token);
+
+            res.data = {token, expires};
+            await next();
+
+        } catch (e) {
+            next(e);
         }
-
-        // If successful, sign JWT
-        const token = auth.jwtSign({
-            userId: user.id,
-            email: user.email
-        });
-        const {iat: expires} = auth.jwtVerify(token);
-
-        res.data = {token, expires};
-
-        await next();
     };

@@ -1,9 +1,13 @@
 const express = require('express');
+const fs = require('fs');
+const {promisify} = require('util');
 const path = require('path');
 const {symbols} = require('origami-core-lib');
 const pluralize = require('pluralize');
 const mwAuth = require('../../middleware/auth');
 const mwFormat = require('../../middleware/formatRamlResponse');
+
+const fsAccess = promisify(fs.access);
 
 const s = symbols([
     // Properties
@@ -17,7 +21,7 @@ module.exports = class Controller {
     constructor(ramlObj) {
         this[s.raml] = ramlObj;
 
-        this.router = new express.Router();
+        this.router = new express.Router({mergeParams: true});
 
 
         // Authenticate the route if it has `securedBy` property
@@ -32,8 +36,8 @@ module.exports = class Controller {
 
         if (ramlObj.resources) {
             ramlObj.resources.forEach(r => {
-                const c = new Controller(r, this.url);
-                this.router.use(c.router);
+                const c = new Controller(r);
+                this.router.use(this.url, c.router);
             });
         }
     }
@@ -43,8 +47,8 @@ module.exports = class Controller {
      * @return {String} Build from RAML
      */
     get url() {
-        if (!this[s.raml].parentUrl) return '/';
-        else return this[s.raml].relativeUri;
+        if (this[s.raml].parentUrl) return this[s.raml].relativeUri;
+        else return '/';
     }
 
     /**
@@ -80,14 +84,18 @@ module.exports = class Controller {
             }, methods);
         }
 
-
         // Override any methods from the file system
+        const overrideMethodsPath = path.join(__dirname, `${this[s.raml].absoluteUri}.js`);
+        let overrideExists = false;
         try {
-            overrideMethods = require(path.join(__dirname, this[s.raml].absoluteUri));
+            await fsAccess(overrideMethodsPath);
+            overrideExists = true;
         } catch (e) {
-            // console.log(e);
-            // No override methods present
+            // Console.log(e);
+            // No override file
         }
+        if (overrideExists) overrideMethods = require(overrideMethodsPath);
+
         // Run the overrides
         const run = Object.entries(overrideMethods).map(async([method, func]) => {
             methods[method] = await func(this);
@@ -96,8 +104,6 @@ module.exports = class Controller {
 
         // Register the methods to the router
         Object.entries(methods).forEach(([m, func]) => {
-            const _m = `     ${m}`.slice(-1 * 'DELETE'.length);
-            console.log(' '.repeat(2), _m.toUpperCase().grey, this[s.raml].absoluteUri.magenta);
             this.router[m](this.url, func, mwFormat(this[s.raml]));
         });
     }
@@ -113,6 +119,9 @@ module.exports = class Controller {
 
 
     async get(req, res, next) {
+        // If there is already data passed, skip
+        if (res.data) return next();
+
         let model;
         let resourceId;
         let modelName;
@@ -151,12 +160,12 @@ module.exports = class Controller {
 
     async put(req, res, next) {
         try {
-            // Const {model, resourceId, modelName} = await this[s.getModel](req, res);
+            const {model, resourceId} = await this[s.getModel](req, res);
+            res.data = await model.update(resourceId, req.body);
         } catch (e) {
             if (next) return next(e);
             else throw e;
         }
-        // Res.data = await model.update(resourceId, req.body);
         if (next) await next();
     }
 

@@ -4,6 +4,7 @@ module.exports = {
         id: 'uuid',
         title: {type: String, required: true},
         type: {type: String, required: false},
-        url: {type: String, required: true}
+        url: {type: String, required: true},
+        data: {type: Object}
     }
 };

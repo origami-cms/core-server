@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const bodyParser = require('body-parser');
+const listEndPoints = require('express-list-endpoints');
 require('colors');
 const {symbols, requireKeys} = require('origami-core-lib');
 const Options = require('./Options');
@@ -60,6 +61,11 @@ module.exports = class Server {
     async [s.setup]() {
         await this[s.setupStore]();
         await this[s.setupMiddleware]();
+        listEndPoints(this[s.app]).forEach(({methods: [m], path: p}) => {
+            const _m = `     ${m}`.slice(-1 * 'DELETE'.length);
+            console.log(' '.repeat(2), _m.toUpperCase().grey, p.magenta);
+        });
+
         this.serve();
     }
 
@@ -89,9 +95,13 @@ module.exports = class Server {
             await require('./middleware/raml')(),
             await require('./controllers/api')(),
         );
+
+        let initialTheme = null;
+        const [setting] = await this[s.store].model('setting').find({setting: 'theme'});
+        if (setting) initialTheme = setting.value;
         // Setup theme
         this[s.app].use(
-            await require('./controllers/theme')()
+            await require('./controllers/theme')(initialTheme)
         );
         this[s.app].use(await require('./middleware/errors')());
         this[s.app].use(await require('./middleware/format')());
