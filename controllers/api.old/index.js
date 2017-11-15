@@ -1,23 +1,25 @@
 const path = require('path');
 const {parse: raml2obj} = require('raml2obj');
-const APIController = require('./APIController');
-const {Route} = require('origami-cms');
-
+const express = require('express');
+const Controller = require('./Controller');
 
 const RAML_PATH = path.resolve(__dirname, '../../raml/api.raml');
 
 module.exports = async() => {
-    const route = new Route('/api/v1');
+    const router = new express.Router();
     const raml = await raml2obj(RAML_PATH);
 
-    const parent = {route};
-    console.log('ℹ️ Origami.APIController: Routes'.magenta);
-    raml.resources.forEach(res => new APIController(res, parent));
 
-    route.use((req, res, next) => {
+    console.log('ℹ️ Origami.APIController: Routes'.magenta);
+    raml.resources.forEach(res => {
+        const c = new Controller(res);
+        router.use(res.relativeUri, c.router);
+    });
+
+    router.use((req, res, next) => {
         if (!res.data) next(new Error('general.errors.notFound'));
         else next();
     });
 
-    return route;
+    return router;
 };

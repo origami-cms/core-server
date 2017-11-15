@@ -1,10 +1,10 @@
 const express = require('express');
-const path = require('path');
-const fs = require('fs');
+const models = require('./models');
+const {symbols, requireKeys} = require('origami-core-lib');
 const bodyParser = require('body-parser');
 const listEndPoints = require('express-list-endpoints');
-require('colors');
-const {symbols, requireKeys} = require('origami-core-lib');
+
+
 const Options = require('./Options');
 
 // Private symbols
@@ -14,13 +14,12 @@ const s = symbols([
     'options',
     'store',
     'admin',
+    'positions',
+    'queues',
     // Methods
     'setup',
-    'setupStore',
     'setupMiddleware'
 ]);
-
-
 const DEFAULT_PORT = 8080;
 
 
@@ -32,10 +31,24 @@ module.exports = class Server {
 
 
         // Assign these to a singleton class so they can be use across the server
-        Options.options = this[s.options] = {...{
-            port: process.env.NODE_ENV || DEFAULT_PORT,
-            ln: 'enUS'
-        }, ...options};
+        Options.options = this[s.options] = {
+            ...{
+                port: process.env.NODE_ENV || DEFAULT_PORT,
+                ln: 'enUS'
+            }, ...options
+        };
+
+
+        // Different positions to run route at
+        this[s.positions] = [
+            'pre-store',
+            'post-store',
+            'pre-render',
+            'post-render',
+            'pre-send'
+        ];
+        this[s.queues] = {};
+        this[s.positions].forEach(p => this[s.queues][p] = []);
 
 
         // Validate the options
@@ -52,57 +65,60 @@ module.exports = class Server {
     }
 
 
+    // Registers all the middleware and serves the app
+    async [s.setup]() {
+        // Setup the store
+        models(this[s.store]);
+        this[s.app].set('store', this[s.store]);
+
+        // Setup the middleware
+        await this[s.setupMiddleware]();
+
+        // Serve the app
+        this.serve();
+    }
+
+
+    // Runs the app
     serve() {
         this[s.app].listen(this[s.options].port);
         console.log('Origami.Server: Listening on port %d', this[s.options].port);
     }
 
 
-    async [s.setup]() {
-        await this[s.setupStore]();
-        await this[s.setupMiddleware]();
+    // Add the Router's routes in each position to the middleware queue
+    useRouter(router) {
+        this[s.positions].forEach(p => {
+            this[s.queues][p].push(router.routers[p]);
+        });
+        router.nested.forEach(this.useRouter.bind(this));
+    }
+
+
+    // Lists all the endpoints and their methods
+    list() {
         listEndPoints(this[s.app]).forEach(({methods: [m], path: p}) => {
             const _m = `     ${m}`.slice(-1 * 'DELETE'.length);
             console.log(' '.repeat(2), _m.toUpperCase().grey, p.magenta);
         });
-
-        this.serve();
-    }
-
-
-    [s.setupStore]() {
-        const store = this[s.store];
-        fs
-            .readdirSync(path.resolve(__dirname, './models'))
-            .filter(f => (/.*\.js$/).test(f))
-            .forEach(f => store.model(
-                f.split('.')[0],
-                require(`./models/${f}`)
-            ));
-
-        this[s.app].set('store', store);
     }
 
 
     async [s.setupMiddleware]() {
         this[s.app].use(bodyParser());
 
-        // Setup admin UI
-        this[s.app].use('/admin/', this[s.admin]());
 
-        // Setup API
-        this[s.app].use('/api/v1',
-            await require('./middleware/raml')(),
-            await require('./controllers/api')(),
+        // Loop over positions, and run middleware queue stored in each
+        this[s.app].use(await require('./middleware/positions')(
+            this[s.positions],
+            this[s.queues]
+        ));
+
+        this.useRouter(
+            await require('./controllers/api')()
         );
 
-        let initialTheme = null;
-        const [setting] = await this[s.store].model('setting').find({setting: 'theme'});
-        if (setting) initialTheme = setting.value;
-        // Setup theme
-        this[s.app].use(
-            await require('./controllers/theme')(initialTheme)
-        );
+
         this[s.app].use(await require('./middleware/errors')());
         this[s.app].use(await require('./middleware/format')());
     }

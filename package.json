@@ -1,6 +1,6 @@
 {
   "name": "origami-core-server",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Core server for Origami CMS",
   "main": "server.js",
   "author": "Tristan Matthias <hello@tristanmathias.com>",
@@ -25,7 +25,8 @@
     "pluralize": "^7.0.0",
     "raml2obj": "^5.5.0",
     "recursive-readdir": "^2.2.1",
-    "request-promise-native": "^1.0.5"
+    "request-promise-native": "^1.0.5",
+    "routington": "^1.0.3"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.0",
