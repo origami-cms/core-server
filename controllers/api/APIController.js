@@ -3,13 +3,16 @@ const {symbols} = require('origami-core-lib');
 const pluralize = require('pluralize');
 const mwAuth = require('../../middleware/auth');
 const routington = require('routington');
+const url = require('url');
+const _ = require('lodash');
 
 const s = symbols([
     // Properties
     'raml',
     // Methods
     'setupMethod',
-    'getModel'
+    'getModel',
+    'mwAssignParams'
 ]);
 
 module.exports = class APIController {
@@ -17,7 +20,11 @@ module.exports = class APIController {
         this[s.raml] = raml;
         this.parent = parent;
 
+        // Create the route
         this.route = parent.route.route(raml.relativeUri);
+
+        // Reassign the params back on the req
+        this.route.use(this[s.mwAssignParams].bind(this));
 
         // Authenticate the route if it has `securedBy` property
         const [auth] = this[s.raml].securedBy || [];
@@ -25,10 +32,12 @@ module.exports = class APIController {
             if (auth.schemeName === 'JWT') this.route.use(mwAuth);
         }
 
+        // Setup methods on THIS resource
         if (raml.methods) raml.methods.forEach(this[s.setupMethod].bind(this));
-
+        // Nest children resources
         if (raml.resources) raml.resources.forEach(r => new APIController(r, this));
     }
+
 
     /**
      * Singular name of the resource
@@ -38,6 +47,7 @@ module.exports = class APIController {
         return pluralize.singular(this[s.raml].displayName.slice(1));
     }
 
+
     /**
      * Get the ID of the request
      * @param {Request} req Request object
@@ -46,14 +56,15 @@ module.exports = class APIController {
     id(req) {
         if (!this.parent.name) return false;
 
-        const r = routington();
-        r.define(this[s.raml].absoluteUri);
-        const {param} = r.match(req.url);
-
-        return param[`${this.parent.name}Id`];
+        return req.params[`${this.parent.name}Id`];
     }
 
 
+    /**
+     * Finds the file of this resource, and returns any methods to override
+     * default methods
+     * @returns {Object} Obejct of methods
+     */
     overrides() {
         let methods = {};
         const fp = path.join(__dirname, `${this[s.raml].absoluteUri}.js`);
@@ -68,6 +79,7 @@ module.exports = class APIController {
 
 
     async get(req, res, next) {
+        console.log("PARMS", req.params);
         // If there is already data passed, skip
         if (res.data) return next();
 
@@ -118,7 +130,7 @@ module.exports = class APIController {
         if (next) await next();
     }
 
-
+    // TODO: Delete resource
     async delete(req, res, next) {
         if (next) await next();
     }
@@ -139,5 +151,20 @@ module.exports = class APIController {
         this.route[method](
             override ? override(this) : this[method].bind(this)
         );
+    }
+
+
+    // HACK: Req.params is lost somehow, even with {mergeParams: true}
+    [s.mwAssignParams](req, res, next) {
+        const r = routington();
+        r.define(this[s.raml].absoluteUri);
+        const match = r.match(url.parse(req.url).pathname);
+
+        if (match) {
+            _.omitBy(match.param, _.isNil);
+            _.omitBy(match.param, _.isLength(0));
+            if (match.param) req.params = match.param;
+        }
+        next();
     }
 };

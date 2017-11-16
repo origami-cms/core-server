@@ -1,4 +1,4 @@
-require('colors');
+const {error} = require('origami-core-lib');
 const status = require('../lib/status');
 
 module.exports = () =>
@@ -14,7 +14,7 @@ module.exports = () =>
                 } else delete res.data;
             }
 
-            console.log(`${new Date().toISOString().red} ❌`, req.method.yellow, req.url.yellow, message.red);
+            error('Server', new Error(`${req.method} ${req.url.yellow} ${message.red}`));
         }
         await next();
     };

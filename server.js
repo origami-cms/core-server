@@ -1,6 +1,6 @@
 const express = require('express');
 const models = require('./models');
-const {symbols, requireKeys} = require('origami-core-lib');
+const {symbols, requireKeys, success} = require('origami-core-lib');
 const bodyParser = require('body-parser');
 const listEndPoints = require('express-list-endpoints');
 
@@ -82,7 +82,7 @@ module.exports = class Server {
     // Runs the app
     serve() {
         this[s.app].listen(this[s.options].port);
-        console.log('Origami.Server: Listening on port %d', this[s.options].port);
+        success('Server', 'Listening on port', this[s.options].port.cyan);
     }
 
 
@@ -105,7 +105,10 @@ module.exports = class Server {
 
 
     async [s.setupMiddleware]() {
-        this[s.app].use(bodyParser());
+        this[s.app].use(bodyParser.urlencoded({
+            extended: true
+        }));
+        this[s.app].use(bodyParser.json());
 
 
         // Loop over positions, and run middleware queue stored in each
@@ -114,9 +117,22 @@ module.exports = class Server {
             this[s.queues]
         ));
 
+        // Setup admin
+        this[s.app].use('/admin/', this[s.admin]());
+
+        // Setup API
         this.useRouter(
             await require('./controllers/api')()
         );
+
+        // Setup theme
+        let initialTheme = null;
+        const [setting] = await this[s.store].model('setting').find({setting: 'theme'});
+        if (setting) initialTheme = setting.value;
+        const theme = await require('./controllers/theme')('snow');
+        console.log(initialTheme, theme);
+
+        this[s.app].use(theme);
 
 
         this[s.app].use(await require('./middleware/errors')());

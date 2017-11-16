@@ -11,7 +11,6 @@ module.exports = async() => {
     const raml = await raml2obj(RAML_PATH);
 
     const parent = {route};
-    console.log('ℹ️ Origami.APIController: Routes'.magenta);
     raml.resources.forEach(res => new APIController(res, parent));
 
     route.use((req, res, next) => {

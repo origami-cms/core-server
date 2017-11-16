@@ -32,10 +32,11 @@ module.exports = class ThemeController {
     async middlewareRenderPage(req, res, next) {
         if (res.data || res.error || res.body) return next();
 
+        // Try find a page in the db
+        const model = await res.app.get('store').model('page');
+        const [page] = await model.find({url: req.url});
+
         try {
-            // Try find a page in the db
-            const model = await res.app.get('store').model('page');
-            const [page] = await model.find({url: req.url});
             // If there is a page with a template, attempt to render it,
             if (page) res.body = await theme.renderTemplate(page.type.toLowerCase(), page);
             // Otherwise attempt to render the view as a page
@@ -43,7 +44,9 @@ module.exports = class ThemeController {
 
             next();
         } catch (e) {
-            next(e);
+            const err = new Error('page.errors.render');
+            err.stack = e.stack;
+            next(err);
         }
     }
 
