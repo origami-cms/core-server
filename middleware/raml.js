@@ -10,7 +10,12 @@ const OSPREY_CONFIG = {
 };
 
 module.exports = async() => {
-    const middleware = await osprey.loadFile(RAML_PATH, OSPREY_CONFIG);
+    let middleware;
+    try {
+        middleware = await osprey.loadFile(RAML_PATH, OSPREY_CONFIG);
+    } catch (e) {
+        console.log(e);
+    }
 
     return (req, res, next) => {
         middleware(req, res, async err => {

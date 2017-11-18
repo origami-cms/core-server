@@ -2,9 +2,6 @@ const path = require('path');
 const {symbols} = require('origami-core-lib');
 const pluralize = require('pluralize');
 const mwAuth = require('../../middleware/auth');
-const routington = require('routington');
-const url = require('url');
-const _ = require('lodash');
 
 const s = symbols([
     // Properties
@@ -21,15 +18,12 @@ module.exports = class APIController {
         this.parent = parent;
 
         // Create the route
-        this.route = parent.route.route(raml.relativeUri);
-
-        // Reassign the params back on the req
-        this.route.use(this[s.mwAssignParams].bind(this));
+        this.route = parent.route.route(raml.relativeUri).position('post-render');
 
         // Authenticate the route if it has `securedBy` property
         const [auth] = this[s.raml].securedBy || [];
         if (auth) {
-            if (auth.schemeName === 'JWT') this.route.use(mwAuth);
+            if (auth.schemeName === 'JWT') this.route.all(mwAuth);
         }
 
         // Setup methods on THIS resource
@@ -79,7 +73,6 @@ module.exports = class APIController {
 
 
     async get(req, res, next) {
-        console.log("PARMS", req.params);
         // If there is already data passed, skip
         if (res.data) return next();
 
@@ -132,6 +125,13 @@ module.exports = class APIController {
 
     // TODO: Delete resource
     async delete(req, res, next) {
+        try {
+            const {model, resourceId} = await this[s.getModel](req, res);
+            res.data = await model.delete(resourceId);
+        } catch (e) {
+            if (next) return next(e);
+            else throw e;
+        }
         if (next) await next();
     }
 
@@ -151,20 +151,5 @@ module.exports = class APIController {
         this.route[method](
             override ? override(this) : this[method].bind(this)
         );
-    }
-
-
-    // HACK: Req.params is lost somehow, even with {mergeParams: true}
-    [s.mwAssignParams](req, res, next) {
-        const r = routington();
-        r.define(this[s.raml].absoluteUri);
-        const match = r.match(url.parse(req.url).pathname);
-
-        if (match) {
-            _.omitBy(match.param, _.isNil);
-            _.omitBy(match.param, _.isLength(0));
-            if (match.param) req.params = match.param;
-        }
-        next();
     }
 };

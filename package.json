@@ -6,7 +6,7 @@
   "author": "Tristan Matthias <hello@tristanmathias.com>",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint ./",
+    "lint": "eslint ./ --fix",
     "start": "cd ../../sample-site; yarn start"
   },
   "dependencies": {

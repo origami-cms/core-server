@@ -1,6 +1,6 @@
 const express = require('express');
 const models = require('./models');
-const {symbols, requireKeys, success} = require('origami-core-lib');
+const {symbols, requireKeys, success, error} = require('origami-core-lib');
 const bodyParser = require('body-parser');
 const listEndPoints = require('express-list-endpoints');
 
@@ -15,9 +15,10 @@ const s = symbols([
     'store',
     'admin',
     'positions',
-    'queues',
+    'positionRouters',
     // Methods
     'setup',
+    'generatePositions',
     'setupMiddleware'
 ]);
 const DEFAULT_PORT = 8080;
@@ -47,8 +48,8 @@ module.exports = class Server {
             'post-render',
             'pre-send'
         ];
-        this[s.queues] = {};
-        this[s.positions].forEach(p => this[s.queues][p] = []);
+        this[s.positionRouters] = {};
+        this[s.positions].forEach(p => this[s.positionRouters][p] = new express.Router());
 
 
         // Validate the options
@@ -71,6 +72,9 @@ module.exports = class Server {
         models(this[s.store]);
         this[s.app].set('store', this[s.store]);
 
+        // Generate the position routers...
+        await this[s.generatePositions]();
+
         // Setup the middleware
         await this[s.setupMiddleware]();
 
@@ -86,10 +90,18 @@ module.exports = class Server {
     }
 
 
-    // Add the Router's routes in each position to the middleware queue
+    // Add the Router's routes in each position to the middleware
     useRouter(router) {
         this[s.positions].forEach(p => {
-            this[s.queues][p].push(router.routers[p]);
+            const pr = this[s.positionRouters][p];
+            router.routers[p].forEach(({path, handlers, method}) => {
+                try {
+                    pr[method](path, handlers);
+                    success('Server', `Conected ${p} route: `, method.toUpperCase().blue, path.blue);
+                } catch (e) {
+                    error('Server', new Error(`Could not connect ${method.toUpperCase().yellow} ${path.yellow}`));
+                }
+            });
         });
         router.nested.forEach(this.useRouter.bind(this));
     }
@@ -104,38 +116,55 @@ module.exports = class Server {
     }
 
 
+    async [s.generatePositions]() {
+        // Setup API
+        this.useRouter(
+            await require('./controllers/api')()
+        );
+    }
+
     async [s.setupMiddleware]() {
         this[s.app].use(bodyParser.urlencoded({
             extended: true
         }));
         this[s.app].use(bodyParser.json());
+        this[s.app].use('/api/v1',
+            await require('./middleware/raml')(),
+            (req, res, next) => next()
+        );
 
 
-        // Loop over positions, and run middleware queue stored in each
-        this[s.app].use(await require('./middleware/positions')(
-            this[s.positions],
-            this[s.queues]
-        ));
+        // PRE-STORE position
+        this[s.app].use(this[s.positionRouters]['pre-store']);
+
+
+        // POST-STORE position
+        this[s.app].use(this[s.positionRouters]['post-store']);
+
 
         // Setup admin
         this[s.app].use('/admin/', this[s.admin]());
 
-        // Setup API
-        this.useRouter(
-            await require('./controllers/api')()
-        );
 
         // Setup theme
         let initialTheme = null;
         const [setting] = await this[s.store].model('setting').find({setting: 'theme'});
         if (setting) initialTheme = setting.value;
-        const theme = await require('./controllers/theme')('snow');
-        console.log(initialTheme, theme);
 
-        this[s.app].use(theme);
+        // PRE-RENDER position
+        this[s.app].use(this[s.positionRouters]['pre-render']);
+        this[s.app].use(
+            /^((?!\/api\/))/,
+            await require('./controllers/theme')(initialTheme)
+        );
+        // POST-RENDER position
+        this[s.app].use(this[s.positionRouters]['post-render']);
 
 
         this[s.app].use(await require('./middleware/errors')());
+
+        // PRE-SEND position
+        this[s.app].use(this[s.positionRouters]['pre-send']);
         this[s.app].use(await require('./middleware/format')());
     }
 };

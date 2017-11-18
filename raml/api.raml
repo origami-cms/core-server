@@ -60,7 +60,16 @@ securitySchemes:
   post:
     body:
       application/json:
-        type: user.Create
+        properties:
+          fname:
+            type: string
+          lname:
+            type: string
+          email:
+            type: string
+          password:
+            type: string
+
     responses:
       201:
         body:
