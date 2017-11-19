@@ -18,7 +18,7 @@ module.exports = class APIController {
         this.parent = parent;
 
         // Create the route
-        this.route = parent.route.route(raml.relativeUri).position('post-render');
+        this.route = parent.route.route(raml.relativeUri).position('store');
 
         // Authenticate the route if it has `securedBy` property
         const [auth] = this[s.raml].securedBy || [];
@@ -148,7 +148,7 @@ module.exports = class APIController {
     async [s.setupMethod]({method}) {
         // Look for an override in the file, otherwise do the default
         const override = await this.overrides()[method];
-        this.route[method](
+        this.route.position('store')[method](
             override ? override(this) : this[method].bind(this)
         );
     }

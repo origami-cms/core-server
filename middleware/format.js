@@ -7,10 +7,16 @@ module.exports = () =>
 
         if (res.responseCode) status(res, res.responseCode, http.OK);
 
-        const body = res.body || res.text || res.data;
+        let body = res.body || res.text || res.data;
+
 
         // If it's a json request, wrap the data as json
-        if (req.is('application/json')) {
+        // NOTE: Attemtped req.is(), however there seemed to be a bug
+        if (
+            req.headers['content-type'] === 'application/json' ||
+            req.path.indexOf('/api') == 0 ||
+            res.data && !res.body
+        ) {
             const returning = {
                 statusCode: res.statusCode
             };
@@ -27,6 +33,12 @@ module.exports = () =>
 
             return res.send(returning);
 
-        } else if (!body) res.send('Not found');
-        else res.send(body);
+        } else if (!body) {
+            res.status(http.NOT_FOUND).send('Not found');
+        } else {
+            const br = '<br />';
+            // Show the error
+            if (res.data) body += br + res.data;
+            res.send(body);
+        }
     };

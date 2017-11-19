@@ -19,7 +19,8 @@ const s = symbols([
     // Methods
     'setup',
     'generatePositions',
-    'setupMiddleware'
+    'setupMiddleware',
+    'position'
 ]);
 const DEFAULT_PORT = 8080;
 
@@ -42,10 +43,16 @@ module.exports = class Server {
 
         // Different positions to run route at
         this[s.positions] = [
+            'init',
+
             'pre-store',
+            'store',
             'post-store',
+
             'pre-render',
+            'render',
             'post-render',
+
             'pre-send'
         ];
         this[s.positionRouters] = {};
@@ -97,6 +104,7 @@ module.exports = class Server {
             router.routers[p].forEach(({path, handlers, method}) => {
                 try {
                     pr[method](path, handlers);
+                    console.log(method, path);
                     success('Server', `Conected ${p} route: `, method.toUpperCase().blue, path.blue);
                 } catch (e) {
                     error('Server', new Error(`Could not connect ${method.toUpperCase().yellow} ${path.yellow}`));
@@ -121,50 +129,61 @@ module.exports = class Server {
         this.useRouter(
             await require('./controllers/api')()
         );
+
+        // Load initial theme
+        let initialTheme = null;
+        const [setting] = await this[s.store].model('setting').find({setting: 'theme'});
+        if (setting) initialTheme = setting.value;
+
+        // Setup Theme
+        this.useRouter(await require('./controllers/theme')(initialTheme));
     }
 
     async [s.setupMiddleware]() {
+
+        this[s.position]('init');
+
+
         this[s.app].use(bodyParser.urlencoded({
             extended: true
         }));
         this[s.app].use(bodyParser.json());
-        this[s.app].use('/api/v1',
-            await require('./middleware/raml')(),
-            (req, res, next) => next()
-        );
-
-
-        // PRE-STORE position
-        this[s.app].use(this[s.positionRouters]['pre-store']);
-
-
-        // POST-STORE position
-        this[s.app].use(this[s.positionRouters]['post-store']);
 
 
         // Setup admin
         this[s.app].use('/admin/', this[s.admin]());
 
 
-        // Setup theme
-        let initialTheme = null;
-        const [setting] = await this[s.store].model('setting').find({setting: 'theme'});
-        if (setting) initialTheme = setting.value;
+        // Validate the API against the RAML
+        this[s.app].use('/api/v1', await require('./middleware/raml')());
+
+
+        // PRE-STORE position
+        this[s.position]('pre-store');
+        this[s.position]('store');
+        this[s.position]('post-store');
+
 
         // PRE-RENDER position
-        this[s.app].use(this[s.positionRouters]['pre-render']);
-        this[s.app].use(
-            /^((?!\/api\/))/,
-            await require('./controllers/theme')(initialTheme)
-        );
-        // POST-RENDER position
-        this[s.app].use(this[s.positionRouters]['post-render']);
+        this[s.position]('pre-render');
+        this[s.position]('render');
+        this[s.position]('post-render');
 
 
+        // Wrap for friendly errors
         this[s.app].use(await require('./middleware/errors')());
 
+
         // PRE-SEND position
-        this[s.app].use(this[s.positionRouters]['pre-send']);
+        this[s.position]('pre-send');
         this[s.app].use(await require('./middleware/format')());
+    }
+
+    // Run the middleware for the router position
+    [s.position](pos) {
+        this[s.app].use((req, res, next) => {
+            console.log(req.method.yellow, req.url.yellow, pos.grey);
+            next();
+        }, this[s.positionRouters][pos]);
     }
 };
