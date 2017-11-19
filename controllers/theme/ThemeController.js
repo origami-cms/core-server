@@ -29,7 +29,7 @@ module.exports = class ThemeController {
 
         // Render pages
         this.route
-            .route(/^((?!\/assets\/))/)
+            .route(/^((?!(\/assets\/|\/api\/)))/)
             .position('store')
             .use(this.middlewareGetPage.bind(this))
             .position('render')
@@ -58,15 +58,24 @@ module.exports = class ThemeController {
     }
     async middlewareRenderPage(req, res, next) {
         const page = res.data;
-        console.log(page);
+
+        // If there is not data for a page (ie: page not in store), then attempt
+        // to render it as a theme page, not a theme template
+        if (!page) {
+            try {
+                res.body = await theme.renderPage(req.path);
+            } catch (e) {
+                return next(e);
+            }
+
+            return next();
+        }
+
         try {
             // If there is a page with a template, attempt to render it,
             if (page) res.body = await theme.renderTemplate(page.type.toLowerCase(), page);
-            // Otherwise attempt to render the view as a page
-            else res.body = await theme.renderPage(req.path);
 
-            if (res.body === false) next(new Error('general.errors.notFound'));
-            else next();
+            next();
 
         } catch (e) {
             const err = new Error('page.errors.render');

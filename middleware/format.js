@@ -4,7 +4,6 @@ const http = require('http-status-codes');
 module.exports = () =>
     async(req, res, next) => {
         await next();
-
         if (res.responseCode) status(res, res.responseCode, http.OK);
 
         let body = res.body || res.text || res.data;
@@ -34,7 +33,7 @@ module.exports = () =>
             return res.send(returning);
 
         } else if (!body) {
-            res.status(http.NOT_FOUND).send('Not found');
+            res.status(http.NOT_FOUND).redirect('/404');
         } else {
             const br = '<br />';
             // Show the error

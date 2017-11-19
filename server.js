@@ -104,7 +104,6 @@ module.exports = class Server {
             router.routers[p].forEach(({path, handlers, method}) => {
                 try {
                     pr[method](path, handlers);
-                    console.log(method, path);
                     success('Server', `Conected ${p} route: `, method.toUpperCase().blue, path.blue);
                 } catch (e) {
                     error('Server', new Error(`Could not connect ${method.toUpperCase().yellow} ${path.yellow}`));
