@@ -18,8 +18,12 @@ module.exports = class ThemeController {
         ));
         // Render styles
         this.router.use('/css', this.middlewareRenderStyles.bind(this));
+
         // Render pages
-        this.router.use(this.middlewareRenderPage.bind(this));
+        this.router.use(
+            /^((?!\/assets\/))/,
+            this.middlewareRenderPage.bind(this)
+        );
 
         // Load the initial theme
         if (initialTheme) {
@@ -52,6 +56,8 @@ module.exports = class ThemeController {
 
     async middlewareRenderStyles(req, res, next) {
         if (res.data || res.error || res.body) return next();
+
+        res.type('css');
 
         try {
             (await theme.renderStyles(req.url))

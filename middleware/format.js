@@ -5,29 +5,28 @@ module.exports = () =>
     async(req, res, next) => {
         await next();
 
-        const isAPI = req.path.indexOf('/api/') === 0;
-
         if (res.responseCode) status(res, res.responseCode, http.OK);
 
-        if (res.text || res.data) {
+        const body = res.body || res.text || res.data;
+
+        // If it's a json request, wrap the data as json
+        if (req.is('application/json')) {
             const returning = {
                 statusCode: res.statusCode
             };
-            if (res.text) returning.message = res.text;
-            if (res.data) returning.data = res.data;
+
+            if (res.text || res.data) {
+                if (res.text) returning.message = res.text;
+                if (res.data) returning.data = res.data;
+
+            } else {
+                res.status(http.NOT_FOUND);
+                returning.statusCode = http.NOT_FOUND;
+                returning.message = 'Not found';
+            }
 
             return res.send(returning);
 
-
-        } else if (isAPI) {
-            return res.status(http.NOT_FOUND).send({
-                statusCode: res.statusCode,
-                message: 'Not found'
-            });
-
-
-        } else if (!res.body) {
-            res.send('Not found');
-
-        } else res.send(res.body);
+        } else if (!body) res.send('Not found');
+        else res.send(body);
     };
