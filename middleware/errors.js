@@ -5,6 +5,7 @@ module.exports = () =>
     async(err, req, res, next) => {
         const errCode = 500;
         if (err) {
+            console.log(err);
             const message = status(res, err.message, errCode);
             if (!res.data && err.data) res.data = err.data;
 

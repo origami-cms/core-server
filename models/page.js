@@ -6,5 +6,6 @@ module.exports = {
         type: {type: String, required: false},
         url: {type: String, required: true},
         data: {type: Object}
-    }
+    },
+    tree: true
 };

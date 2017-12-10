@@ -8,7 +8,6 @@ module.exports = () =>
 
         let body = res.body || res.text || res.data;
 
-
         // If it's a json request, wrap the data as json
         // NOTE: Attemtped req.is(), however there seemed to be a bug
         if (
@@ -33,11 +32,17 @@ module.exports = () =>
             return res.send(returning);
 
         } else if (!body) {
-            res.status(http.NOT_FOUND).redirect('/404');
+            res.status(http.NOT_FOUND);
+            // If it's a page request, redirect
+            if (req.headers.accept.includes('text/html')) res.redirect('/404');
+            // Otherwise send nothing
+            else res.send();
         } else {
-            const br = '<br />';
-            // Show the error
-            if (res.data) body += br + res.data;
+            if (res.statusCode != http.OK) {
+                const br = '<br />';
+                // Show the error
+                if (res.data) body += br + res.data;
+            }
             res.send(body);
         }
     };

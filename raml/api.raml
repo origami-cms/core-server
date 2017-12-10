@@ -87,11 +87,23 @@ securitySchemes:
   type: collection
   /types:
     get:
+  /tree:
+    get:
+    /:pageId:
+      get:
   /:pageId:
     type: collection-item
     /properties:
       get:
       put:
+    /move:
+      post:
+        body:
+          application/json:
+            properties:
+              parent:
+                type: string
+
 
 /templates:
   type: collection

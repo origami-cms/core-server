@@ -62,9 +62,11 @@ module.exports = class APIController {
     overrides() {
         let methods = {};
         const fp = path.join(__dirname, `${this[s.raml].absoluteUri}.js`);
+
         try {
             methods = require(fp);
         } catch (e) {
+            if (fp.includes('tree')) console.log(e);
             // No file
         }
 

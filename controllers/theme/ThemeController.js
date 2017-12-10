@@ -53,9 +53,17 @@ module.exports = class ThemeController {
         // Try find a page in the db
         const model = await res.app.get('store').model('page');
         const [page] = await model.find({url: req.url});
+
         res.data = page;
+
+        if (page) {
+            res.isPage = true;
+            res.pageType = page.type;
+            res.data.children = await model.children(page.id, true);
+        }
         next();
     }
+
     async middlewareRenderPage(req, res, next) {
         const page = res.data;
 
