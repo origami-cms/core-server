@@ -93,7 +93,7 @@ module.exports = class Server {
     // Runs the app
     serve() {
         this[s.app].listen(this[s.options].port);
-        success('Server', 'Listening on port', this[s.options].port.cyan);
+        success('Server', 'Listening on port', this[s.options].port.toString().cyan);
     }
 
 
