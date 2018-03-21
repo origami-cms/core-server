@@ -1,14 +1,14 @@
-import { Origami } from "../types/global";
-import { NextFunction, Response } from "express";
+import {Origami} from '../types/global';
+import {NextFunction, Response} from 'express';
 
 const status = require('../lib/status');
 const http = require('http-status-codes');
 
 export default (): Function => {
     interface Returning {
-        statusCode: number,
-        data?: object,
-        message?: string
+        statusCode: number;
+        data?: object;
+        message?: string;
     }
 
     return async(req: Origami.ServerRequest, res: Origami.ServerResponse, next: NextFunction) => {
@@ -21,7 +21,7 @@ export default (): Function => {
         // NOTE: Attemtped req.is(), however there seemed to be a bug
         if (
             req.headers['content-type'] === 'application/json' ||
-            req.path.indexOf('/api') == 0 ||
+            req.path.indexOf('/api') === 0 ||
             res.data && !res.body
         ) {
             const returning: Returning = {
@@ -41,15 +41,19 @@ export default (): Function => {
             res.send(returning);
             return;
 
-        } else if (!body) {
+        }
+
+        if (!body) {
             res.status(http.NOT_FOUND);
             // If it's a page request, redirect
-            if (typeof req.headers.accept != 'string') throw new Error('accept header should be a string');
+            if (typeof req.headers.accept !== 'string') {
+                throw new Error('accept header should be a string');
+            }
             if (req.headers.accept.includes('text/html')) res.redirect('/404');
             // Otherwise send nothing
             else res.send();
         } else {
-            if (res.statusCode != http.OK) {
+            if (res.statusCode !== http.OK) {
                 const br = '<br />';
                 // Show the error
                 if (res.data) body += br + res.data;
@@ -57,4 +61,4 @@ export default (): Function => {
             res.send(body);
         }
     };
-}
+};

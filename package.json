@@ -6,7 +6,7 @@
   "author": "Tristan Matthias <hello@tristanmathias.com>",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint ./ --fix",
+    "lint": "tslint -s node_modules/custom-tslint-formatters/formatters -t grouped src/**/*.ts --fix",
     "start": "cd ../../sample-site; yarn start"
   },
   "dependencies": {
@@ -29,7 +29,8 @@
     "raml2obj": "^5.5.0",
     "recursive-readdir": "^2.2.1",
     "request-promise-native": "^1.0.5",
-    "routington": "^1.0.3"
+    "routington": "^1.0.3",
+    "tslint-config-airbnb": "^5.8.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^1.0.0",
@@ -37,12 +38,8 @@
     "@types/lodash": "^4.14.105",
     "@types/pug": "^2.0.4",
     "@types/recursive-readdir": "^2.2.0",
-    "babel-eslint": "^8.0.0",
     "custom-tslint-formatters": "^2.3.0",
-    "eslint": "^4.7.2",
-    "eslint-plugin-prefer-object-spread": "^1.2.1",
     "tslint": "^5.9.1",
-    "tslint-config-standard": "^7.0.0",
     "typescript": "^2.7.2"
   }
 }

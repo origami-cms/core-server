@@ -6,9 +6,9 @@ const getResponse = (raml, method, code = CODE_OK) => {
     const res = raml.methods.find(m => m.method === method.toLowerCase());
     if (!res) return false;
     if (!res.responses) return false;
-    const body = res.responses.find(r => r.code == code);
+    const body = res.responses.find(r => r.code === code);
     if (!body) return false;
-    if (body.body[0].typePropertyKind != 'JSON') return;
+    if (body.body[0].typePropertyKind !== 'JSON') return;
 
     return JSON.parse(body.body[0].type).data;
 };

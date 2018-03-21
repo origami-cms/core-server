@@ -1,92 +1,94 @@
-import { Request, Response } from "express";
+import {Request, Response} from 'express';
 
 export module Origami {
     export namespace Server {
-        export type Position = 'init' | 'pre-store' | 'store' | 'post-store' | 'pre-render' | 'render' | 'post-render' | 'pre-send'
+        export type Position = 'init' | 'pre-store' | 'store' | 'post-store' |
+            'pre-render' | 'render' | 'post-render' | 'pre-send';
 
         export type URL = string | null | RegExp;
 
-        export type Method = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'PATCH' | 'USE'
+        export type Method = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' |
+            'CONNECT' | 'OPTIONS' | 'PATCH' | 'USE';
     }
 
     export namespace Theme {
         export interface Config {
-            name: string,
+            name: string;
             paths?: {
                 styles?: string
                 views?: string
                 content?: string
-            }
+            };
         }
     }
 
     // ------------------------------------------------------------- Config file
     export interface Config {
         /** Settings for the overall project */
-        "app": ConfigApp;
+        'app': ConfigApp;
         /** Settings for the store/database */
-        "store": ConfigStore;
+        'store': ConfigStore;
         /** Settings for the theme */
-        "theme": ConfigTheme;
+        'theme': ConfigTheme;
         /** Settings for the server setup */
-        "server": ConfigServer;
+        'server': ConfigServer;
     }
 
     export interface ConfigApp {
         /** Name of the project */
-        "name": string;
+        'name': string;
     }
 
     export interface ConfigStore {
         /** Store/Database type to integrate with */
-        "type": string;
+        'type': string;
         /** Store/Database hostname to connect with */
-        "host": string;
+        'host': string;
         /** Store/Database port to connect with */
-        "port": number;
+        'port': number;
         /** Store/Database db name to connect with */
-        "database": string;
+        'database': string;
         /** Store/Database username to connect with */
-        "username": string;
+        'username': string;
         /** Store/Database password to connect with */
-        "password": string;
+        'password': string;
     }
 
     export interface ConfigTheme {
         /** Theme name to run */
-        "name": string
+        'name': string;
     }
 
     export interface ConfigServer {
         /** Secret code to encrypt data and authentication tokens with */
-        "secret": string,
+        'secret': string;
         /** Port number to run the server on */
-        "port": number
+        'port': number;
         /** Server language */
-        "ln": string,
+        'ln': string;
     }
 
     export interface ServerRequest extends Request {
         jwt: {
             token: string,
             data: object
-        }
+        };
     }
 
     export interface ServerResponse extends Response {
-        data?: object,
-        body?: string,
-        text?: string,
-        responseCode?: string
+        data?: object;
+        body?: string;
+        text?: string;
+        responseCode?: string;
     }
 
     export interface ServerError extends Error {
-        data: object
+        data: object;
     }
 
     /**
      * Valid types of Origami modules to install via NPM
      * @example origami-theme-snow, origami-store-mongodb, origami-plugin-facebook
      */
-    export type ModuleType = 'theme' | 'store' | 'plugin' | 'admin'
+    export type ModuleType = 'theme' | 'store' | 'plugin' | 'admin';
 }

@@ -1,15 +1,15 @@
-import { Handler, NextFunction } from "express";
-import { Origami } from "../types/global";
+import {Handler, NextFunction} from 'express';
+import {Origami} from '../types/global';
 
 const path = require('path');
 const osprey = require('osprey');
 
 const RAML_PATH = path.resolve(__dirname, '../../raml/api.raml');
 const OSPREY_CONFIG = {
-    'server': {
-        'notFoundHandler': false
+    server: {
+        notFoundHandler: false
     },
-    'disableErrorInterception': true
+    disableErrorInterception: true
 };
 
 export default async() => {

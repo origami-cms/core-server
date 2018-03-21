@@ -1,5 +1,5 @@
-import { Origami } from "../types/global";
-import { NextFunction } from "express";
+import {Origami} from '../types/global';
+import {NextFunction} from 'express';
 
 const {error} = require('origami-core-lib');
 import status from '../lib/status';
@@ -13,7 +13,7 @@ export default () =>
             if (!res.data && err.data) res.data = err.data;
 
             // If (res.statusCode === errCode) {
-            if (process.env.NODE_ENV != 'production' && err.stack) {
+            if (process.env.NODE_ENV !== 'production' && err.stack) {
                 res.data = err.stack.split('\n');
             } else delete res.data;
             // }

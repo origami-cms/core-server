@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import {Request, Response, NextFunction} from 'express';
 import {Origami} from '../types/global';
 
 const auth = require('../lib/auth');
-export default async(req: Origami.ServerRequest, res: Response, next: NextFunction) => {
+export default async(req: Origami.ServerRequest, res: Origami.ServerResponse, next: NextFunction) => {
     try {
         const head = req.headers.authorization;
         const _auth = head as string;

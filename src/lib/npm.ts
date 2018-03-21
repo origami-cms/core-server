@@ -1,4 +1,4 @@
-import { Origami } from "../types/global";
+import {Origami} from '../types/global';
 
 const npm = require('npm-programmatic');
 const _ = require('lodash');
@@ -18,7 +18,7 @@ export const list = (type: Origami.ModuleType) => {
         .map(p => (/^(.*)@.+$/).exec(p)[1]);
 
     if (!reg) return list;
-    else if (reg) return list.filter(p => reg.test(p));
+    if (reg) return list.filter(p => reg.test(p));
 };
 
 // Searches api.npms.io
@@ -30,7 +30,7 @@ module.exports.search = async(type = '') => {
     list = list.map(p => p.package);
 
     if (reg) return list.filter(p => reg.test(p.name));
-    else return list;
+    return list;
 };
 
 
