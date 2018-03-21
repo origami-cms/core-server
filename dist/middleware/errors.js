@@ -21,7 +21,7 @@ exports.default = () => (err, req, res, next) => __awaiter(this, void 0, void 0,
         if (!res.data && err.data)
             res.data = err.data;
         // If (res.statusCode === errCode) {
-        if (process.env.NODE_ENV != 'production' && err.stack) {
+        if (process.env.NODE_ENV !== 'production' && err.stack) {
             res.data = err.stack.split('\n');
         }
         else

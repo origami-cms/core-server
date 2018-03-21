@@ -10,10 +10,10 @@ const getResponse = (raml, method, code = CODE_OK) => {
         return false;
     if (!res.responses)
         return false;
-    const body = res.responses.find(r => r.code == code);
+    const body = res.responses.find(r => r.code === code);
     if (!body)
         return false;
-    if (body.body[0].typePropertyKind != 'JSON')
+    if (body.body[0].typePropertyKind !== 'JSON')
         return;
     return JSON.parse(body.body[0].type).data;
 };

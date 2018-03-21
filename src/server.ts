@@ -1,6 +1,6 @@
-import {Application, Router, Request, Response, NextFunction} from "express";
-import {Route, RouterListItem} from "./Router";
-import {Origami} from "./types/global";
+import {Application, Router, Request, Response, NextFunction} from 'express';
+import {Route, RouterListItem} from './Router';
+import {Origami} from './types/global';
 
 import mwRaml from './middleware/raml';
 import mwErrors from './middleware/errors';
@@ -41,14 +41,14 @@ type positionRouters = {
 const DEFAULT_PORT = 8080;
 
 
-module.exports = class Server {
-    app: Application
-    store: any
-    admin: Route
+export default class Server {
+    app: Application;
+    store: any;
+    admin: Route;
 
     private _positions: Origami.Server.Position[];
     private _positionRouters: positionRouters;
-    private _options: Origami.ConfigServer
+    private _options: Origami.ConfigServer;
 
     constructor(options: Origami.ConfigServer, store: any, admin: Route) {
         this.app = express();
@@ -81,14 +81,14 @@ module.exports = class Server {
         ];
 
         this._positionRouters = {
-            'init': [],
+            init: [],
 
             'pre-store': [],
-            'store': [],
+            store: [],
             'post-store': [],
 
             'pre-render': [],
-            'render': [],
+            render: [],
             'post-render': [],
 
             'pre-send': []
@@ -144,11 +144,11 @@ module.exports = class Server {
         this._positions.forEach(p => {
             const pr: Router[] = this._positionRouters[p];
             interface obj {
-                path: Origami.Server.URL,
-                handlers: Function[],
-                method: Origami.Server.Method
+                path: Origami.Server.URL;
+                handlers: Function[];
+                method: Origami.Server.Method;
             }
-            router.routers[p].forEach(({ path, handlers, method }: RouterListItem) => {
+            router.routers[p].forEach(({path, handlers, method}: RouterListItem) => {
                 const p = (path || '').toString();
                 try {
                     pr[method.toLowerCase()](path, handlers);
@@ -166,10 +166,10 @@ module.exports = class Server {
     // Lists all the endpoints and their methods
     list() {
         interface endpoint {
-            methods: string[],
-            path: string
+            methods: string[];
+            path: string;
         }
-        listEndPoints(this.app).forEach(({ methods: [m], path: p }: endpoint) => {
+        listEndPoints(this.app).forEach(({methods: [m], path: p}: endpoint) => {
             const _m = `     ${m}`.slice(-1 * 'DELETE'.length);
             console.log(' '.repeat(2), _m.toUpperCase().grey, p.magenta);
         });
@@ -184,7 +184,7 @@ module.exports = class Server {
 
         // Load initial theme
         let initialTheme = null;
-        const [setting] = await this.store.model('setting').find({ setting: 'theme' });
+        const [setting] = await this.store.model('setting').find({setting: 'theme'});
         if (setting) initialTheme = setting.value;
 
         // Setup Theme
@@ -238,4 +238,4 @@ module.exports = class Server {
             next();
         }, this._positionRouters[pos]);
     }
-};
+}

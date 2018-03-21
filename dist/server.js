@@ -36,7 +36,7 @@ const s = symbols([
     'position'
 ]);
 const DEFAULT_PORT = 8080;
-module.exports = class Server {
+class Server {
     constructor(options, store, admin) {
         this.app = express();
         this.store = store;
@@ -58,12 +58,12 @@ module.exports = class Server {
             'pre-send'
         ];
         this._positionRouters = {
-            'init': [],
+            init: [],
             'pre-store': [],
-            'store': [],
+            store: [],
             'post-store': [],
             'pre-render': [],
-            'render': [],
+            render: [],
             'post-render': [],
             'pre-send': []
         };
@@ -172,4 +172,5 @@ module.exports = class Server {
             next();
         }, this._positionRouters[pos]);
     }
-};
+}
+exports.default = Server;

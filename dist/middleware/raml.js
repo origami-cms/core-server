@@ -12,10 +12,10 @@ const path = require('path');
 const osprey = require('osprey');
 const RAML_PATH = path.resolve(__dirname, '../../raml/api.raml');
 const OSPREY_CONFIG = {
-    'server': {
-        'notFoundHandler': false
+    server: {
+        notFoundHandler: false
     },
-    'disableErrorInterception': true
+    disableErrorInterception: true
 };
 exports.default = () => __awaiter(this, void 0, void 0, function* () {
     let middleware;

@@ -1,5 +1,5 @@
 /// <reference types="express" />
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 export declare module Origami {
     namespace Server {
         type Position = 'init' | 'pre-store' | 'store' | 'post-store' | 'pre-render' | 'render' | 'post-render' | 'pre-send';
@@ -18,43 +18,43 @@ export declare module Origami {
     }
     interface Config {
         /** Settings for the overall project */
-        "app": ConfigApp;
+        'app': ConfigApp;
         /** Settings for the store/database */
-        "store": ConfigStore;
+        'store': ConfigStore;
         /** Settings for the theme */
-        "theme": ConfigTheme;
+        'theme': ConfigTheme;
         /** Settings for the server setup */
-        "server": ConfigServer;
+        'server': ConfigServer;
     }
     interface ConfigApp {
         /** Name of the project */
-        "name": string;
+        'name': string;
     }
     interface ConfigStore {
         /** Store/Database type to integrate with */
-        "type": string;
+        'type': string;
         /** Store/Database hostname to connect with */
-        "host": string;
+        'host': string;
         /** Store/Database port to connect with */
-        "port": number;
+        'port': number;
         /** Store/Database db name to connect with */
-        "database": string;
+        'database': string;
         /** Store/Database username to connect with */
-        "username": string;
+        'username': string;
         /** Store/Database password to connect with */
-        "password": string;
+        'password': string;
     }
     interface ConfigTheme {
         /** Theme name to run */
-        "name": string;
+        'name': string;
     }
     interface ConfigServer {
         /** Secret code to encrypt data and authentication tokens with */
-        "secret": string;
+        'secret': string;
         /** Port number to run the server on */
-        "port": number;
+        'port': number;
         /** Server language */
-        "ln": string;
+        'ln': string;
     }
     interface ServerRequest extends Request {
         jwt: {

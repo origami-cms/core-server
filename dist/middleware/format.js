@@ -19,7 +19,7 @@ exports.default = () => {
         // If it's a json request, wrap the data as json
         // NOTE: Attemtped req.is(), however there seemed to be a bug
         if (req.headers['content-type'] === 'application/json' ||
-            req.path.indexOf('/api') == 0 ||
+            req.path.indexOf('/api') === 0 ||
             res.data && !res.body) {
             const returning = {
                 statusCode: res.statusCode,
@@ -38,18 +38,19 @@ exports.default = () => {
             res.send(returning);
             return;
         }
-        else if (!body) {
+        if (!body) {
             res.status(http.NOT_FOUND);
             // If it's a page request, redirect
-            if (typeof req.headers.accept != 'string')
+            if (typeof req.headers.accept !== 'string') {
                 throw new Error('accept header should be a string');
+            }
             if (req.headers.accept.includes('text/html'))
                 res.redirect('/404');
             else
                 res.send();
         }
         else {
-            if (res.statusCode != http.OK) {
+            if (res.statusCode !== http.OK) {
                 const br = '<br />';
                 // Show the error
                 if (res.data)

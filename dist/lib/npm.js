@@ -25,7 +25,7 @@ exports.list = (type) => {
         .map(p => (/^(.*)@.+$/).exec(p)[1]);
     if (!reg)
         return list;
-    else if (reg)
+    if (reg)
         return list.filter(p => reg.test(p));
 };
 // Searches api.npms.io
@@ -37,6 +37,5 @@ module.exports.search = (type = '') => __awaiter(this, void 0, void 0, function*
     list = list.map(p => p.package);
     if (reg)
         return list.filter(p => reg.test(p.name));
-    else
-        return list;
+    return list;
 });

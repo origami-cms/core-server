@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "lint": "tslint -s node_modules/custom-tslint-formatters/formatters -t grouped src/**/*.ts --fix",
-    "start": "cd ../../sample-site; yarn start"
+    "start": "cd ../../sample-site; yarn start",
+    "build": "tsc"
   },
   "dependencies": {
     "@types/colors": "^1.1.3",

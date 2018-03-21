@@ -33,6 +33,7 @@
         "max-line-length": {
             "severity": "warning",
             "options": [100]
-        }
+        },
+        "align": false
     }
 }
