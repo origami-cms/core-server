@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
-const {Route} = require('origami-cms');
-
+const {Route} = require('../../dist/Router');
 const theme = require('../../lib/theme/Theme');
 
 
@@ -41,7 +40,7 @@ module.exports = class ThemeController {
         const routes = await theme.routes();
         routes.forEach(r => {
             const router = require(r);
-            this.route.nest(router);
+            this.route.route(router);
         });
     }
 

@@ -1,7 +1,7 @@
 const path = require('path');
 const {parse: raml2obj} = require('raml2obj');
 const APIController = require('./APIController');
-const {Route} = require('origami-cms');
+const {Route} = require('../../dist/Router');
 const {passwordHash} = require('../../lib/auth');
 
 

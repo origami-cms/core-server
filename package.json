@@ -2,7 +2,7 @@
   "name": "origami-core-server",
   "version": "0.0.7",
   "description": "Core server for Origami CMS",
-  "main": "server.js",
+  "main": "dist/server.js",
   "author": "Tristan Matthias <hello@tristanmathias.com>",
   "license": "MIT",
   "scripts": {
@@ -10,6 +10,8 @@
     "start": "cd ../../sample-site; yarn start"
   },
   "dependencies": {
+    "@types/colors": "^1.1.3",
+    "@types/express": "^4.11.1",
     "bcrypt": "^1.0.3",
     "colors": "^1.1.2",
     "express": "^4.15.4",
@@ -30,8 +32,17 @@
     "routington": "^1.0.3"
   },
   "devDependencies": {
+    "@types/bcrypt": "^1.0.0",
+    "@types/jsonwebtoken": "^7.2.6",
+    "@types/lodash": "^4.14.105",
+    "@types/pug": "^2.0.4",
+    "@types/recursive-readdir": "^2.2.0",
     "babel-eslint": "^8.0.0",
+    "custom-tslint-formatters": "^2.3.0",
     "eslint": "^4.7.2",
-    "eslint-plugin-prefer-object-spread": "^1.2.1"
+    "eslint-plugin-prefer-object-spread": "^1.2.1",
+    "tslint": "^5.9.1",
+    "tslint-config-standard": "^7.0.0",
+    "typescript": "^2.7.2"
   }
 }
