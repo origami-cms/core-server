@@ -31,7 +31,7 @@
     "recursive-readdir": "^2.2.1",
     "request-promise-native": "^1.0.5",
     "routington": "^1.0.3",
-    "tslint-config-airbnb": "^5.8.0"
+    "tslint-config-origami": "^1.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^1.0.0",
