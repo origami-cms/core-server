@@ -22,9 +22,14 @@ export const jwtSign = (data: object): string =>
         }
     );
 
-
-export const jwtVerify = (token: string) =>
+export interface JWTVerifyResult {
+    iat: string;
+    exp: string;
+    userId: string;
+    email: string;
+}
+export const jwtVerify = (token: string): JWTVerifyResult =>
     jwt.verify(
         token,
         Options.options.secret.toString()
-    );
+    ) as JWTVerifyResult;

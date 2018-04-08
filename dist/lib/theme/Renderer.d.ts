@@ -3,7 +3,7 @@ export interface Engine {
     engine: any;
 }
 declare const _default: {
-    render(theme: string, fileOrEngine: string, data: object): any;
+    render(theme: string, fileOrEngine: string, data?: object): any;
     getEngine(fileOrEngine: string, themeName: string): Engine;
     getFunction({ name, engine }: Engine, theme: string): Function;
 };

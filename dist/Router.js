@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Route {
     constructor(url = null, parent) {
-        this.__position = 'init';
+        this._curposition = 'init';
         this._url = url;
         this.parent = parent;
         // Different positions to run route at
@@ -18,12 +18,12 @@ class Route {
         ];
         // A different array of middleware for each position
         this.routers = {
-            'init': [],
+            init: [],
             'pre-store': [],
-            'store': [],
+            store: [],
             'post-store': [],
             'pre-render': [],
-            'render': [],
+            render: [],
             'post-render': [],
             'pre-send': []
         };
@@ -38,16 +38,15 @@ class Route {
             this._activeRouter = this.routers[v];
         else
             throw new Error(`Origami.Route: No position ${v}`);
-        this.__position = v;
+        this._curposition = v;
     }
     get _position() {
-        return this.__position;
+        return this._curposition;
     }
     get url() {
         if (this._url instanceof RegExp)
             return this._url;
-        else
-            return `${this.parent ? this.parent.url : ''}${this._url || ''}`;
+        return `${this.parent ? this.parent.url : ''}${this._url || ''}`;
     }
     // Route methods
     get(...handlers) { return this._route('GET', ...handlers); }

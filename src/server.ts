@@ -1,68 +1,58 @@
-import {Application, Router, Request, Response, NextFunction} from 'express';
+import express, {Application, Router, Request, Response, NextFunction} from 'express';
+import bodyParser from 'body-parser';
+const listEndPoints = require('express-list-endpoints');
+
+import {Origami, requireKeys, success, error} from 'origami-core-lib';
+
 import {Route, RouterListItem} from './Router';
-import {Origami} from './types/global';
 
 import mwRaml from './middleware/raml';
 import mwErrors from './middleware/errors';
 import mwFormat from './middleware/format';
+import {ErrorRequestHandler} from 'express-serve-static-core';
 
+import models from './models';
+import api from './controllers/api';
+import theme from './controllers/theme';
+import runScripts from './scripts';
 
-const express = require('express');
-const models = require('../models');
-const {symbols, requireKeys, success, error} = require('origami-core-lib');
-const bodyParser = require('body-parser');
-const listEndPoints = require('express-list-endpoints');
-
-
-const Options = require('../Options');
-
-// Private symbols
-const s = symbols([
-    // Props
-    'app',
-    'options',
-    'store',
-    'admin',
-    'positions',
-    'positionRouters',
-    // Methods
-    'setup',
-    'generatePositions',
-    'setupMiddleware',
-    'position'
-]);
+// tslint:disable-next-line
+import Options from './Options';
 
 
 type positionRouters = {
-    [K in Origami.Server.Position]: Router[]
+    [K in Origami.Server.Position]: Router
 };
 
 
 const DEFAULT_PORT = 8080;
 
 
+export {Route} from './Router';
+
 export default class Server {
     app: Application;
     store: any;
-    admin: Route;
+    admin: Function;
 
     private _positions: Origami.Server.Position[];
     private _positionRouters: positionRouters;
     private _options: Origami.ConfigServer;
 
-    constructor(options: Origami.ConfigServer, store: any, admin: Route) {
+    constructor(options: Origami.ConfigServer, store: any, admin: Function) {
         this.app = express();
         this.store = store;
         this.admin = admin;
 
 
         // Assign these to a singleton class so they can be use across the server
-        Options.options = this._options = {
-            ...{
+        this._options = {
+            ... {
                 port: process.env.NODE_ENV || DEFAULT_PORT,
                 ln: 'enUS'
             }, ...options
         };
+        Options.options = this._options;
 
 
         // Different positions to run route at
@@ -81,20 +71,18 @@ export default class Server {
         ];
 
         this._positionRouters = {
-            init: [],
+            init: express.Router(),
 
-            'pre-store': [],
-            store: [],
-            'post-store': [],
+            'pre-store': express.Router(),
+            store: express.Router(),
+            'post-store': express.Router(),
 
-            'pre-render': [],
-            render: [],
-            'post-render': [],
+            'pre-render': express.Router(),
+            render: express.Router(),
+            'post-render': express.Router(),
 
-            'pre-send': []
+            'pre-send': express.Router()
         };
-
-        this._positions.forEach(p => this._positionRouters[p] = new express.Router());
 
 
         // Validate the options
@@ -136,13 +124,16 @@ export default class Server {
     serve() {
         this.app.listen(this._options.port);
         success('Server', 'Listening on port', this._options.port.toString().cyan);
+
+        runScripts(this);
     }
 
 
     // Add the Router's routes in each position to the middleware
     useRouter(router: Route) {
         this._positions.forEach(p => {
-            const pr: Router[] = this._positionRouters[p];
+            const pr = this._positionRouters[p];
+
             interface obj {
                 path: Origami.Server.URL;
                 handlers: Function[];
@@ -151,7 +142,8 @@ export default class Server {
             router.routers[p].forEach(({path, handlers, method}: RouterListItem) => {
                 const p = (path || '').toString();
                 try {
-                    pr[method.toLowerCase()](path, handlers);
+                    const m = method.toLowerCase() as keyof Router;
+                    (pr[m] as Function)(path, handlers);
                     success('Server', `Conected ${p} route: `, method.toUpperCase().blue, p.blue);
                 } catch (e) {
                     console.log(e);
@@ -179,7 +171,7 @@ export default class Server {
     private async _generatePositions() {
         // Setup API
         this.useRouter(
-            await require('../controllers/api')()
+            await api()
         );
 
         // Load initial theme
@@ -188,10 +180,10 @@ export default class Server {
         if (setting) initialTheme = setting.value;
 
         // Setup Theme
-        this.useRouter(await require('../controllers/theme')(initialTheme));
+        this.useRouter(await theme(initialTheme));
     }
 
-    async _setupMiddleware() {
+    private async _setupMiddleware() {
 
         this._position('init');
 
@@ -223,7 +215,7 @@ export default class Server {
 
 
         // Wrap for friendly errors
-        this.app.use(await mwErrors());
+        this.app.use(mwErrors);
 
 
         // PRE-SEND position
@@ -232,7 +224,7 @@ export default class Server {
     }
 
     // Run the middleware for the router position
-    _position(pos: Origami.Server.Position) {
+    private _position(pos: Origami.Server.Position) {
         this.app.use((req: Request, res: Response, next: NextFunction) => {
             console.log(req.method.yellow, req.url.yellow, pos.grey);
             next();

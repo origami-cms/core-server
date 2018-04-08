@@ -1,18 +1,18 @@
 import fs from 'fs';
 import path from 'path';
 import {promisify} from 'util';
-const engines = require('./engines');
+import engines from './engines.js';
 import * as pug from 'pug';
 
 const fsRead = promisify(fs.readFile);
 
 export interface Engine {
-    name: string | false,
-    engine: any
+    name: string | false;
+    engine: any;
 }
 
 export default new class Renderer {
-    render(theme: string, fileOrEngine: string, data: object) {
+    render(theme: string, fileOrEngine: string, data: object = {}) {
         return this.getFunction(
             this.getEngine(fileOrEngine, theme),
             theme

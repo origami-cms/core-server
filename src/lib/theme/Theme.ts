@@ -1,4 +1,4 @@
-import { Origami } from "../../types/global";
+import {Origami} from 'origami-core-lib';
 
 import fs from 'fs';
 import path from 'path';
@@ -6,15 +6,24 @@ import readdir from 'recursive-readdir';
 import {promisify} from 'util';
 import _ from 'lodash';
 
-const Renderer = require('./Renderer');
+import Renderer from './Renderer';
 const fsReadDir = promisify(fs.readdir);
 const fsReadFile = promisify(fs.readFile);
 
 const DEFAULT_THEME = 'snow';
 const MODULE_PREFIX = 'origami-theme-';
 
-module.exports = new class Theme {
-    config: Origami.Theme.Config
+
+export interface TemplateFile {
+    name: string;
+    type: string;
+    template: string;
+    config?: object;
+}
+
+
+export default new class Theme {
+    config: Origami.Theme.Config;
 
     constructor() {
         this.config = {
@@ -51,14 +60,8 @@ module.exports = new class Theme {
 
     // Retrieve a list of, or indivual templates from the theme folder
     async templates(template?: string) {
-        interface file {
-            name: string,
-            type: string,
-            template: string,
-            config?: object
-        };
 
-        const transform = (f: string): file => ({
+        const transform = (f: string): TemplateFile => ({
             name: path.basename(f, path.extname(f)),
             type: path.extname(f).slice(1),
             template: ''
@@ -81,18 +84,23 @@ module.exports = new class Theme {
         }
 
         return (await readdir(this.pathTemplates))
-            .filter(f => path.extname(f) != '.json')
+            .filter(f => path.extname(f) !== '.json')
             .map(transform);
     }
 
-    async routes() {
-        return (await readdir(this.pathRoutes))
-            .filter(f => path.extname(f) === '.js');
+    async routes(): Promise<string[]> {
+        try {
+            return (await readdir(this.pathRoutes))
+                .filter(f => path.extname(f) === '.js');
+        } catch (e) {
+            return [];
+        }
     }
 
     // Load the theme file and set it to the config
     load(theme: string) {
         this.config.name = theme;
+
         this.config = require(path.resolve(this.pathTheme, 'theme.json'));
 
         this.config.paths = _.mapValues(this.config.paths, v =>
@@ -114,7 +122,7 @@ module.exports = new class Theme {
         return this._renderStyles(p);
     }
 
-    async _renderPage(p: string, data: object, prefix: string) {
+    private async _renderPage(p: string, data: object, prefix: string) {
         const file = await this._getFile(p, prefix);
         if (!file) return false;
 
@@ -125,7 +133,7 @@ module.exports = new class Theme {
         );
     }
 
-    async _renderStyles(p: string) {
+    private async _renderStyles(p: string) {
         const _p = p.split('.').slice(0, -1).join('.');
         const file = await this._getFile(_p, this.pathStyles);
 
@@ -136,7 +144,7 @@ module.exports = new class Theme {
 
 
     // Lookup a theme page file url based on request url
-    async _getFile(url: string, prefix: string): Promise<string | false> {
+    private async _getFile(url: string, prefix: string): Promise<string | false> {
         let p = url;
         // Allow for index at / resources
         if (p.slice(-1) === '/') p += 'index';
@@ -148,7 +156,7 @@ module.exports = new class Theme {
             const parent = path.dirname(p);
             files = (await fsReadDir(parent))
                 // Remove all the page data definition json files
-                .filter(f => path.extname(f) != '.json');
+                .filter(f => path.extname(f) !== '.json');
         } catch (e) {
             // If the file cannot be resolved, return false
             return false;

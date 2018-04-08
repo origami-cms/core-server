@@ -1,17 +1,17 @@
-import {Origami} from '../types/global';
-import {NextFunction, Response} from 'express';
+import {Origami} from 'origami-core-lib';
+import {NextFunction, Response, RequestHandler} from 'express';
 
-const status = require('../lib/status');
-const http = require('http-status-codes');
+import status from '../lib/status';
+import http from 'http-status-codes';
 
-export default (): Function => {
+export default (): RequestHandler => {
     interface Returning {
         statusCode: number;
         data?: object;
         message?: string;
     }
 
-    return async(req: Origami.ServerRequest, res: Origami.ServerResponse, next: NextFunction) => {
+    const fn = async(req: Origami.Server.Request, res: Origami.Server.Response, next: NextFunction) => {
         await next();
         if (res.responseCode) status(res, res.responseCode, http.OK);
 
@@ -61,4 +61,7 @@ export default (): Function => {
             res.send(body);
         }
     };
+
+
+    return fn as RequestHandler;
 };

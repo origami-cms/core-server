@@ -1,7 +1,7 @@
-import {Handler, NextFunction} from 'express';
-import {Origami} from '../types/global';
+import {Handler, NextFunction, RequestHandler} from 'express';
+import {Origami} from 'origami-core-lib';
 
-const path = require('path');
+import path from 'path';
 const osprey = require('osprey');
 
 const RAML_PATH = path.resolve(__dirname, '../../raml/api.raml');
@@ -12,7 +12,14 @@ const OSPREY_CONFIG = {
     disableErrorInterception: true
 };
 
-export default async() => {
+interface OspreyRequestError {
+    type: string;
+    dataPath: string;
+    keyword: string;
+    schema: object;
+}
+
+export default async(): Promise<RequestHandler> => {
     let middleware: Handler;
     try {
         middleware = await osprey.loadFile(RAML_PATH, OSPREY_CONFIG);
@@ -20,11 +27,13 @@ export default async() => {
         console.log(e);
     }
 
-    return (req: Origami.ServerRequest, res: Origami.ServerResponse, next: NextFunction) => {
+    const fn = (req: Origami.Server.Request, res: Origami.Server.Response, next: NextFunction) => {
         middleware(req, res, async err => {
+            console.log(err);
+
             if (err) {
                 try {
-                    res.data = err.requestErrors.map(e => ({
+                    res.data = err.requestErrors.map((e: OspreyRequestError)  => ({
                         type: e.type,
                         field: e.dataPath,
                         rule: e.keyword,
@@ -37,4 +46,6 @@ export default async() => {
             } else await next();
         });
     };
+
+    return fn as RequestHandler;
 };

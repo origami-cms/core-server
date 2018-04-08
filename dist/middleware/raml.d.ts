@@ -1,5 +1,4 @@
 /// <reference types="express" />
-import { NextFunction } from 'express';
-import { Origami } from '../types/global';
-declare const _default: () => Promise<(req: Origami.ServerRequest, res: Origami.ServerResponse, next: NextFunction) => void>;
+import { RequestHandler } from 'express';
+declare const _default: () => Promise<RequestHandler>;
 export default _default;

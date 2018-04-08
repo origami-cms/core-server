@@ -1,20 +1,15 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+}
 Object.defineProperty(exports, "__esModule", { value: true });
-const status = require('../lib/status');
-const http = require('http-status-codes');
+const status_1 = __importDefault(require("../lib/status"));
+const http_status_codes_1 = __importDefault(require("http-status-codes"));
 exports.default = () => {
-    return (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-        yield next();
+    const fn = async (req, res, next) => {
+        await next();
         if (res.responseCode)
-            status(res, res.responseCode, http.OK);
+            status_1.default(res, res.responseCode, http_status_codes_1.default.OK);
         let body = res.body || res.text || res.data;
         // If it's a json request, wrap the data as json
         // NOTE: Attemtped req.is(), however there seemed to be a bug
@@ -31,15 +26,15 @@ exports.default = () => {
                     returning.data = res.data;
             }
             else {
-                res.status(http.NOT_FOUND);
-                returning.statusCode = http.NOT_FOUND;
+                res.status(http_status_codes_1.default.NOT_FOUND);
+                returning.statusCode = http_status_codes_1.default.NOT_FOUND;
                 returning.message = 'Not found';
             }
             res.send(returning);
             return;
         }
         if (!body) {
-            res.status(http.NOT_FOUND);
+            res.status(http_status_codes_1.default.NOT_FOUND);
             // If it's a page request, redirect
             if (typeof req.headers.accept !== 'string') {
                 throw new Error('accept header should be a string');
@@ -50,7 +45,7 @@ exports.default = () => {
                 res.send();
         }
         else {
-            if (res.statusCode !== http.OK) {
+            if (res.statusCode !== http_status_codes_1.default.OK) {
                 const br = '<br />';
                 // Show the error
                 if (res.data)
@@ -58,5 +53,6 @@ exports.default = () => {
             }
             res.send(body);
         }
-    });
+    };
+    return fn;
 };

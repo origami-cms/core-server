@@ -1,7 +1,7 @@
-import {Origami} from '../types/global';
+import {Origami} from 'origami-core-lib';
 
 const statuses = require('origami-core-server-statuses');
-const query = require('json-query');
+import query from 'json-query';
 
 /**
  * Lookup a status message from the language file based on the message id,
@@ -11,7 +11,7 @@ const query = require('json-query');
  * @param code Status code (will be potentially overriden)
  * @return The message object
  */
-export default (res: Origami.ServerResponse, message: string, code: number): string => {
+export default (res: Origami.Server.Response, message: string, code: number): string => {
     const ln = statuses(res.app.get('ln'));
     let m = query(message, {data: ln}).value;
     let c = code;
