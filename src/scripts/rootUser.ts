@@ -9,9 +9,10 @@ export default async(app: Server) => {
     const c = await config.read();
     if (!c) return error('Could not open config file');
 
-    const model = await app.app.get('store').model('user') as Origami.Store.Model;
+    const store = await app.app.get('store') as Origami.Store.Store;
+    const modelUser = store.model('user') as Origami.Store.Model;
 
-    const existing = await model.find({email: 'bot@origamicms.com'});
+    const existing = await modelUser.find({email: 'bot@origamicms.com'});
     if (existing instanceof Array && existing.length) {
         if (existing.length === 1) return existing[0];
         return error('Cannot have more than one default user');
@@ -24,5 +25,5 @@ export default async(app: Server) => {
         password: await auth.passwordHash(c.store.password)
     };
 
-    await model.create(user);
+    await modelUser.create(user);
 };

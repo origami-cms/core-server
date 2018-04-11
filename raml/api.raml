@@ -120,9 +120,16 @@ securitySchemes:
     post:
 
 /settings:
+  securedBy: JWT
   get:
   post:
   /:setting:
     get:
     delete:
     put:
+
+
+/setup:
+  get:
+  /user:
+    post:
