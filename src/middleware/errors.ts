@@ -3,7 +3,12 @@ import {NextFunction, ErrorRequestHandler} from 'express';
 
 import status from '../lib/status';
 
-export default (async(err: Origami.Server.DataError, req: Origami.Server.Request, res: Origami.Server.Response, next: NextFunction) => {
+export default (async(
+    err: Origami.Server.DataError,
+    req: Origami.Server.Request,
+    res: Origami.Server.Response,
+    next: NextFunction
+) => {
     const errCode = 500;
     if (err) {
         console.log(err);

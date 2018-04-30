@@ -1,7 +1,7 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+}
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -20,11 +20,12 @@ exports.default = new class Renderer {
             // Otherwise fileOrEngine is just the engine...
             : fileOrEngine;
         const engine = engines_js_1.default[name];
-        // If (!engine) throw new Error(`Origami.Theme: Rendering engine '${name}' is not supported`);
         try {
             return {
                 name,
-                engine: engine ? require(path_1.default.resolve(process.cwd(), 'node_modules', engine)) : false
+                engine: engine
+                    ? require(path_1.default.resolve(process.cwd(), 'node_modules', engine))
+                    : false
             };
         }
         catch (e) {
@@ -57,7 +58,6 @@ exports.default = new class Renderer {
             case false:
             default:
                 return (text) => fs_1.default.createReadStream(text);
-            // Throw new Error(`Could not render with extension ${name}`);
         }
     }
 }();

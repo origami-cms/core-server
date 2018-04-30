@@ -1,5 +1,5 @@
-import { Origami } from 'origami-core-lib';
-import { Route } from '../../Router';
+import {Origami} from 'origami-core-lib';
+import {Route} from '../../Router';
 const pluralize = require('pluralize');
 
 import auth from '../../middleware/auth';
@@ -33,7 +33,7 @@ export default class Controller {
             let useAuth = false;
             if (this.options.auth) {
                 if (this.options.auth === true) useAuth = true;
-                else if (this.options.auth[m] === true) useAuth = true;
+                else if (this.options.auth[m]) useAuth = true;
             }
 
             rMethod.bind(this.router)(useAuth ? auth : null, cMethod.bind(this));
@@ -50,7 +50,11 @@ export default class Controller {
     }
 
 
-    async get(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction) {
+    async get(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: Origami.Server.NextFunction
+    ) {
         // If there is already data passed, skip
         if (res.data) return next();
 
@@ -58,13 +62,13 @@ export default class Controller {
         let resourceId;
 
         try {
-            ({ model, resourceId } = await this._getModel(req, res));
+            ({model, resourceId} = await this._getModel(req, res));
         } catch (e) {
             if (next) return next(e);
             throw e;
         }
 
-        const filter = resourceId ? { id: resourceId } : null;
+        const filter = resourceId ? {id: resourceId} : null;
         const data = await model.find(filter);
 
         // If getting a single resource, and there is none, 404
@@ -76,7 +80,11 @@ export default class Controller {
     }
 
 
-    async post(req: Origami.Server.Request, res: Origami.Server.Response, next?: Origami.Server.NextFunction) {
+    async post(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next?: Origami.Server.NextFunction
+    ) {
         try {
             const {model} = await this._getModel(req, res);
             res.data = await model.create(req.body);
@@ -89,7 +97,11 @@ export default class Controller {
     }
 
 
-    async put(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction) {
+    async put(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: Origami.Server.NextFunction
+    ) {
         try {
             const {model, resourceId} = await this._getModel(req, res);
             res.data = await model.update(resourceId, req.body);
@@ -101,7 +113,11 @@ export default class Controller {
     }
 
     // TODO: Delete resource
-    async delete(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction) {
+    async delete(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: Origami.Server.NextFunction
+    ) {
         try {
             const {model, resourceId} = await this._getModel(req, res);
             res.data = await model.delete(resourceId);

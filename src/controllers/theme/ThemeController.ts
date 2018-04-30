@@ -26,7 +26,12 @@ export default class ThemeController {
         ));
         // Serve project content
         this.route.route('/assets').use(express.static(
-            path.resolve(process.cwd(), 'node_modules', `origami-theme-${theme.config.name}`, 'assets')
+            path.resolve(
+                process.cwd(),
+                'node_modules',
+                `origami-theme-${theme.config.name}`,
+                'assets'
+            )
         ));
         // Render styles
         this.route.route('/css').use(this.middlewareRenderStyles.bind(this));
@@ -51,7 +56,11 @@ export default class ThemeController {
 
     // If the request is already handled, leave it, otherwise pass on to
     // rendering
-    async middlewareGetPage(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction) {
+    async middlewareGetPage(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: Origami.Server.NextFunction
+    ) {
         if (res.data || res.error || res.body) return next();
 
         // Try find a page in the db
@@ -73,7 +82,11 @@ export default class ThemeController {
         next();
     }
 
-    async middlewareRenderPage(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction) {
+    async middlewareRenderPage(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: Origami.Server.NextFunction
+    ) {
         const page = res.data as TemplateFile;
 
         // If there is not data for a page (ie: page not in store), then attempt
@@ -101,7 +114,11 @@ export default class ThemeController {
         }
     }
 
-    async middlewareRenderStyles(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction) {
+    async middlewareRenderStyles(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: Origami.Server.NextFunction
+    ) {
         if (res.data || res.error || res.body) return next();
 
         res.type('css');

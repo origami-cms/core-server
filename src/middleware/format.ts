@@ -11,7 +11,11 @@ export default (): RequestHandler => {
         message?: string;
     }
 
-    const fn = async(req: Origami.Server.Request, res: Origami.Server.Response, next: NextFunction) => {
+    const fn = async(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: NextFunction
+    ) => {
         await next();
         if (res.responseCode) status(res, res.responseCode, http.OK);
 

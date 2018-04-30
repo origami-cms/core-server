@@ -80,7 +80,9 @@ export const search = async (type = '') => {
     let reg: RegExp | null = null;
     if (type) reg = new RegExp(`origami-${type}`);
 
-    const {results: list} = JSON.parse(await request(`https://api.npms.io/v2/search?q=origami-${type}-`)) as NPMSearchResults;
+    const {results: list} = JSON.parse(
+        await request(`https://api.npms.io/v2/search?q=origami-${type}-`)
+    ) as NPMSearchResults;
 
     const simple = list.map(p => p.package);
 

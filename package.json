@@ -7,7 +7,7 @@
   "license": "MIT",
   "typings": "build/server.d.ts",
   "scripts": {
-    "lint": "tslint -s node_modules/custom-tslint-formatters/formatters -t grouped src/**/*.ts --fix",
+    "lint": "tslint -p . --fix",
     "start": "tsc --watch",
     "build": "tsc"
   },
@@ -42,7 +42,6 @@
     "@types/pug": "^2.0.4",
     "@types/recursive-readdir": "^2.2.0",
     "@types/request-promise-native": "^1.0.14",
-    "custom-tslint-formatters": "^2.3.0",
     "tslint": "^5.9.1",
     "tslint-config-origami": "^1.0.0",
     "typescript": "^2.7.2"

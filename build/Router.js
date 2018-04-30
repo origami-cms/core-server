@@ -49,12 +49,24 @@ class Route {
         return `${this.parent ? this.parent.url : ''}${this._url || ''}`;
     }
     // Route methods
-    get(...handlers) { return this._route('GET', ...handlers); }
-    post(...handlers) { return this._route('POST', ...handlers); }
-    put(...handlers) { return this._route('PUT', ...handlers); }
-    delete(...handlers) { return this._route('DELETE', ...handlers); }
-    all(...handlers) { return this._route('USE', ...handlers); }
-    use(...handlers) { return this._route('USE', ...handlers); }
+    get(...handlers) {
+        return this._route('GET', ...handlers);
+    }
+    post(...handlers) {
+        return this._route('POST', ...handlers);
+    }
+    put(...handlers) {
+        return this._route('PUT', ...handlers);
+    }
+    delete(...handlers) {
+        return this._route('DELETE', ...handlers);
+    }
+    all(...handlers) {
+        return this._route('USE', ...handlers);
+    }
+    use(...handlers) {
+        return this._route('USE', ...handlers);
+    }
     // Change the position (active router)
     position(position) {
         this._position = position;
@@ -67,12 +79,6 @@ class Route {
         this.nested.push(r);
         return r;
     }
-    // nest(route: Route) {
-    //     // if (!(route instanceof Route)) throw new Error('Origami.Router: Invalid route. Must be of type Route');
-    //     route.parent = this;
-    //     this.nested.push(route);
-    //     return this;
-    // }
     // Registers the activeRouter (set by position()) to handle on the url
     _route(method, ...handlers) {
         this._activeRouter.push({

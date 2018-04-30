@@ -1,7 +1,7 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+}
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -93,8 +93,12 @@ exports.default = new class Theme {
             throw new Error(`Template '${type}' has no associated .json config file`);
         }
     }
-    renderPage(p, data = {}) { return this._renderPage(p, data, this.pathPages); }
-    renderTemplate(p, data = {}) { return this._renderPage(p, data, this.pathTemplates); }
+    renderPage(p, data = {}) {
+        return this._renderPage(p, data, this.pathPages);
+    }
+    renderTemplate(p, data = {}) {
+        return this._renderPage(p, data, this.pathTemplates);
+    }
     renderStyles(p) {
         return this._renderStyles(p);
     }
@@ -122,7 +126,6 @@ exports.default = new class Theme {
         try {
             const parent = path_1.default.dirname(p);
             files = (await fsReadDir(parent))
-                // Remove all the page data definition json files
                 .filter(f => path_1.default.extname(f) !== '.json');
         }
         catch (e) {

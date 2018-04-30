@@ -81,7 +81,11 @@ export default class APIController {
     }
 
 
-    async get(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction) {
+    async get(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: Origami.Server.NextFunction
+    ) {
         // If there is already data passed, skip
         if (res.data) return next();
 
@@ -108,7 +112,11 @@ export default class APIController {
     }
 
 
-    async post(req: Origami.Server.Request, res: Origami.Server.Response, next?: Origami.Server.NextFunction) {
+    async post(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next?: Origami.Server.NextFunction
+    ) {
         try {
             const {model, modelName} = await this._getModel(req, res);
             res.data = await model.create(req.body);
@@ -121,7 +129,11 @@ export default class APIController {
     }
 
 
-    async put(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction) {
+    async put(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: Origami.Server.NextFunction
+    ) {
         try {
             const {model, resourceId} = await this._getModel(req, res);
             res.data = await model.update(resourceId, req.body);
@@ -133,7 +145,11 @@ export default class APIController {
     }
 
     // TODO: Delete resource
-    async delete(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction) {
+    async delete(
+        req: Origami.Server.Request,
+        res: Origami.Server.Response,
+        next: Origami.Server.NextFunction
+    ) {
         try {
             const {model, resourceId} = await this._getModel(req, res);
             res.data = await model.delete(resourceId);

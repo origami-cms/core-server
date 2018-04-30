@@ -149,7 +149,10 @@ export default class Server {
                     success('Server', `Conected ${p} route: `, method.toUpperCase().blue, p.blue);
                 } catch (e) {
                     console.log(e);
-                    error('Server', new Error(`Could not connect ${method.toUpperCase().yellow} ${p.yellow}`));
+                    error(
+                        'Server',
+                        new Error(`Could not connect ${method.toUpperCase().yellow} ${p.yellow}`)
+                    );
                 }
             });
         });

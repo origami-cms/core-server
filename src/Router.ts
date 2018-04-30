@@ -83,12 +83,24 @@ export class Route {
 
 
     // Route methods
-    get(...handlers: Origami.Server.RequestHandler[]): this { return this._route('GET', ...handlers); }
-    post(...handlers: Origami.Server.RequestHandler[]): this { return this._route('POST', ...handlers); }
-    put(...handlers: Origami.Server.RequestHandler[]): this { return this._route('PUT', ...handlers); }
-    delete(...handlers: Origami.Server.RequestHandler[]): this { return this._route('DELETE', ...handlers); }
-    all(...handlers: Origami.Server.RequestHandler[]): this { return this._route('USE', ...handlers); }
-    use(...handlers: Origami.Server.RequestHandler[]): this { return this._route('USE', ...handlers); }
+    get(...handlers: Origami.Server.RequestHandler[]): this {
+        return this._route('GET', ...handlers);
+    }
+    post(...handlers: Origami.Server.RequestHandler[]): this {
+        return this._route('POST', ...handlers);
+    }
+    put(...handlers: Origami.Server.RequestHandler[]): this {
+        return this._route('PUT', ...handlers);
+    }
+    delete(...handlers: Origami.Server.RequestHandler[]): this {
+        return this._route('DELETE', ...handlers);
+    }
+    all(...handlers: Origami.Server.RequestHandler[]): this {
+        return this._route('USE', ...handlers);
+    }
+    use(...handlers: Origami.Server.RequestHandler[]): this {
+        return this._route('USE', ...handlers);
+    }
 
     // Change the position (active router)
     position(position: Origami.Server.Position) {
@@ -107,17 +119,12 @@ export class Route {
         return r;
     }
 
-    // nest(route: Route) {
-    //     // if (!(route instanceof Route)) throw new Error('Origami.Router: Invalid route. Must be of type Route');
-    //     route.parent = this;
-    //     this.nested.push(route);
-
-    //     return this;
-    // }
-
 
     // Registers the activeRouter (set by position()) to handle on the url
-    private _route(method: Origami.Server.Method, ...handlers: Origami.Server.RequestHandler[]): this {
+    private _route(
+        method: Origami.Server.Method,
+        ...handlers: Origami.Server.RequestHandler[]
+    ): this {
         this._activeRouter.push({
             path: this.url,
             handlers,

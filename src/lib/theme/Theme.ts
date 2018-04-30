@@ -122,8 +122,12 @@ export default new class Theme {
         }
     }
 
-    renderPage(p: string, data: object = {}) { return this._renderPage(p, data, this.pathPages); }
-    renderTemplate(p: string, data: object = {}) { return this._renderPage(p, data, this.pathTemplates); }
+    renderPage(p: string, data: object = {}) {
+        return this._renderPage(p, data, this.pathPages);
+    }
+    renderTemplate(p: string, data: object = {}) {
+        return this._renderPage(p, data, this.pathTemplates);
+    }
     renderStyles(p: string) {
         return this._renderStyles(p);
     }

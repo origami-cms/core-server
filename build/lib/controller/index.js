@@ -1,7 +1,7 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+}
 Object.defineProperty(exports, "__esModule", { value: true });
 const Router_1 = require("../../Router");
 const pluralize = require('pluralize');
@@ -21,7 +21,7 @@ class Controller {
             if (this.options.auth) {
                 if (this.options.auth === true)
                     useAuth = true;
-                else if (this.options.auth[m] === true)
+                else if (this.options.auth[m])
                     useAuth = true;
             }
             rMethod.bind(this.router)(useAuth ? auth_1.default : null, cMethod.bind(this));

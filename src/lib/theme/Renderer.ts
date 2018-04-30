@@ -28,14 +28,17 @@ export default new class Renderer {
             : fileOrEngine;
 
         const engine = engines[name];
-        // If (!engine) throw new Error(`Origami.Theme: Rendering engine '${name}' is not supported`);
         try {
             return {
                 name,
-                engine: engine ? require(path.resolve(process.cwd(), 'node_modules', engine)) : false
+                engine: engine
+                    ? require(path.resolve(process.cwd(), 'node_modules', engine))
+                    : false
             };
         } catch (e) {
-            throw new Error(`Origami.Theme: Theme '${themeName}' requires '${engine}' to be installed`);
+            throw new Error(
+                `Origami.Theme: Theme '${themeName}' requires '${engine}' to be installed`
+            );
         }
     }
 
