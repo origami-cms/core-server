@@ -29,16 +29,22 @@ export default new class Theme {
         this.config = {
             name: ''
         };
-        this.load(DEFAULT_THEME);
     }
 
     // Path to the theme module folder from the root project
     get pathTheme() {
-        return path.resolve(
+        const localPath = path.resolve(
+            process.cwd(),
+            this.config.name
+        );
+        const modulePath = path.resolve(
             process.cwd(),
             'node_modules',
             MODULE_PREFIX + this.config.name
         );
+
+        if (fs.existsSync(localPath)) return localPath;
+        return modulePath;
     }
 
     // Path to the pages folder relative to the theme module

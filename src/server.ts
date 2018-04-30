@@ -2,7 +2,7 @@ import express, {Application, Router, Request, Response, NextFunction} from 'exp
 import bodyParser from 'body-parser';
 const listEndPoints = require('express-list-endpoints');
 
-import {Origami, requireKeys, success, error} from 'origami-core-lib';
+import {Origami, requireKeys, success, error, config} from 'origami-core-lib';
 
 import {Route, RouterListItem} from './Router';
 
@@ -162,6 +162,10 @@ export default class Server {
         this.useRouter(c.router);
     }
 
+    // Wrapper for express.static
+    static(path: string) {
+        this.app.use(express.static(path));
+    }
 
     // Lists all the endpoints and their methods
     list() {
@@ -186,6 +190,11 @@ export default class Server {
         let initialTheme = null;
         const [setting] = await this.store.model('setting').find({setting: 'theme'});
         if (setting) initialTheme = setting.value;
+        const c = await config.read();
+        if (c && c.theme) {
+            if (c.theme.name) initialTheme = c.theme.name;
+            else if (c.theme.path) initialTheme = c.theme.path;
+        }
 
         // Setup Theme
         if (initialTheme) this.useRouter(await theme(initialTheme));

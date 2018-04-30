@@ -1,7 +1,7 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -18,11 +18,14 @@ exports.default = new class Theme {
         this.config = {
             name: ''
         };
-        this.load(DEFAULT_THEME);
     }
     // Path to the theme module folder from the root project
     get pathTheme() {
-        return path_1.default.resolve(process.cwd(), 'node_modules', MODULE_PREFIX + this.config.name);
+        const localPath = path_1.default.resolve(process.cwd(), this.config.name);
+        const modulePath = path_1.default.resolve(process.cwd(), 'node_modules', MODULE_PREFIX + this.config.name);
+        if (fs_1.default.existsSync(localPath))
+            return localPath;
+        return modulePath;
     }
     // Path to the pages folder relative to the theme module
     get pathPages() {
@@ -119,6 +122,7 @@ exports.default = new class Theme {
         try {
             const parent = path_1.default.dirname(p);
             files = (await fsReadDir(parent))
+                // Remove all the page data definition json files
                 .filter(f => path_1.default.extname(f) !== '.json');
         }
         catch (e) {

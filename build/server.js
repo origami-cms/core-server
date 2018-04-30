@@ -1,7 +1,7 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -107,6 +107,10 @@ class Server {
         const c = new lib_1.Controller(resource, this.store, options);
         this.useRouter(c.router);
     }
+    // Wrapper for express.static
+    static(path) {
+        this.app.use(express_1.default.static(path));
+    }
     // Lists all the endpoints and their methods
     list() {
         listEndPoints(this.app).forEach(({ methods: [m], path: p }) => {
@@ -122,6 +126,13 @@ class Server {
         const [setting] = await this.store.model('setting').find({ setting: 'theme' });
         if (setting)
             initialTheme = setting.value;
+        const c = await origami_core_lib_1.config.read();
+        if (c && c.theme) {
+            if (c.theme.name)
+                initialTheme = c.theme.name;
+            else if (c.theme.path)
+                initialTheme = c.theme.path;
+        }
         // Setup Theme
         if (initialTheme)
             this.useRouter(await theme_1.default(initialTheme));
