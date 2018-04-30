@@ -2,6 +2,7 @@
 import { Application } from 'express';
 import { Origami } from 'origami-core-lib';
 import { Route } from './Router';
+import { ControllerOptions } from './lib/controller';
 export { Route } from './Router';
 export default class Server {
     app: Application;
@@ -14,6 +15,7 @@ export default class Server {
     private _setup();
     serve(): void;
     useRouter(router: Route): void;
+    controller(resource: string, options: ControllerOptions): void;
     list(): void;
     private _generatePositions();
     private _setupMiddleware();

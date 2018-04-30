@@ -16,6 +16,7 @@ const theme_1 = __importDefault(require("./controllers/theme"));
 const scripts_1 = __importDefault(require("./scripts"));
 // tslint:disable-next-line
 const Options_1 = __importDefault(require("./Options"));
+const lib_1 = require("./lib");
 const DEFAULT_PORT = 8080;
 var Router_1 = require("./Router");
 exports.Route = Router_1.Route;
@@ -102,6 +103,10 @@ class Server {
         });
         router.nested.forEach(this.useRouter.bind(this));
     }
+    controller(resource, options) {
+        const c = new lib_1.Controller(resource, this.store, options);
+        this.useRouter(c.router);
+    }
     // Lists all the endpoints and their methods
     list() {
         listEndPoints(this.app).forEach(({ methods: [m], path: p }) => {
@@ -118,7 +123,8 @@ class Server {
         if (setting)
             initialTheme = setting.value;
         // Setup Theme
-        this.useRouter(await theme_1.default(initialTheme));
+        if (initialTheme)
+            this.useRouter(await theme_1.default(initialTheme));
     }
     async _setupMiddleware() {
         this._position('init');

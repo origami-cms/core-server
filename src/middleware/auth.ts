@@ -4,8 +4,6 @@ import {Origami} from 'origami-core-lib';
 import * as auth from '../lib/auth';
 
 export default async(req: Origami.Server.Request, res: Origami.Server.Response, next: NextFunction) => {
-    console.log('got here');
-
     try {
         const head = req.headers.authorization;
         const _auth = head as string;

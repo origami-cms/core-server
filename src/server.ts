@@ -18,6 +18,8 @@ import runScripts from './scripts';
 
 // tslint:disable-next-line
 import Options from './Options';
+import {Controller} from './lib';
+import {ControllerOptions} from './lib/controller';
 
 
 type positionRouters = {
@@ -155,6 +157,12 @@ export default class Server {
     }
 
 
+    controller(resource: string, options: ControllerOptions) {
+        const c = new Controller(resource, this.store, options);
+        this.useRouter(c.router);
+    }
+
+
     // Lists all the endpoints and their methods
     list() {
         interface endpoint {
@@ -180,7 +188,7 @@ export default class Server {
         if (setting) initialTheme = setting.value;
 
         // Setup Theme
-        this.useRouter(await theme(initialTheme));
+        if (initialTheme) this.useRouter(await theme(initialTheme));
     }
 
     private async _setupMiddleware() {

@@ -9,7 +9,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const auth = __importStar(require("../lib/auth"));
 exports.default = async (req, res, next) => {
-    console.log('got here');
     try {
         const head = req.headers.authorization;
         const _auth = head;
