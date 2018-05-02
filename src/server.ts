@@ -246,7 +246,7 @@ export default class Server {
     // Run the middleware for the router position
     private _position(pos: Origami.Server.Position) {
         this.app.use((req: Request, res: Response, next: NextFunction) => {
-            console.log(req.method.yellow, req.url.yellow, pos.grey);
+            // console.log(req.method.yellow, req.url.yellow, pos.grey);
             next();
         }, this._positionRouters[pos]);
     }

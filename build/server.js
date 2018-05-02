@@ -164,7 +164,7 @@ class Server {
     // Run the middleware for the router position
     _position(pos) {
         this.app.use((req, res, next) => {
-            console.log(req.method.yellow, req.url.yellow, pos.grey);
+            // console.log(req.method.yellow, req.url.yellow, pos.grey);
             next();
         }, this._positionRouters[pos]);
     }
