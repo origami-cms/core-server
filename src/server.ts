@@ -1,5 +1,6 @@
 import express, {Application, Router, Request, Response, NextFunction} from 'express';
 import bodyParser from 'body-parser';
+import helmet from 'helmet';
 const listEndPoints = require('express-list-endpoints');
 
 import {Origami, requireKeys, success, error, config} from 'origami-core-lib';
@@ -106,6 +107,7 @@ export default class Server {
         // Setup the store
         models(this.store);
         this.app.set('store', this.store);
+        this.app.use(helmet());
 
         // Generate the position routers...
         await this._generatePositions();

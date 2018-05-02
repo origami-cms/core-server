@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const helmet_1 = __importDefault(require("helmet"));
 const listEndPoints = require('express-list-endpoints');
 const origami_core_lib_1 = require("origami-core-lib");
 const raml_1 = __importDefault(require("./middleware/raml"));
@@ -67,6 +68,7 @@ class Server {
         // Setup the store
         models_1.default(this.store);
         this.app.set('store', this.store);
+        this.app.use(helmet_1.default());
         // Generate the position routers...
         await this._generatePositions();
         // Const content = await require('origami-core-server-content')();
