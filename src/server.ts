@@ -1,27 +1,21 @@
-import express, {Application, Router, Request, Response, NextFunction} from 'express';
 import bodyParser from 'body-parser';
+import express, {Application, NextFunction, Request, Response, Router} from 'express';
 import helmet from 'helmet';
-const listEndPoints = require('express-list-endpoints');
+import {config, error, Origami, requireKeys, success} from 'origami-core-lib';
 
-import {Origami, requireKeys, success, error, config} from 'origami-core-lib';
-
-import {Route, RouterListItem} from './Router';
-
-import mwRaml from './middleware/raml';
-import mwErrors from './middleware/errors';
-import mwFormat from './middleware/format';
-import {ErrorRequestHandler} from 'express-serve-static-core';
-
-import models from './models';
 import api from './controllers/api';
 import theme from './controllers/theme';
-import runScripts from './scripts';
-
-// tslint:disable-next-line
-import Options from './Options';
 import {Controller} from './lib';
 import {ControllerOptions} from './lib/controller';
+import mwErrors from './middleware/errors';
+import mwFormat from './middleware/format';
+import mwRaml from './middleware/raml';
+import models from './models';
+import Options from './Options';
+import {Route, RouterListItem} from './Router';
+import runScripts from './scripts';
 
+const listEndPoints = require('express-list-endpoints');
 
 type positionRouters = {
     [K in Origami.Server.Position]: Router

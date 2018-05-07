@@ -3,21 +3,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const express_1 = __importDefault(require("express"));
 const helmet_1 = __importDefault(require("helmet"));
-const listEndPoints = require('express-list-endpoints');
 const origami_core_lib_1 = require("origami-core-lib");
-const raml_1 = __importDefault(require("./middleware/raml"));
-const errors_1 = __importDefault(require("./middleware/errors"));
-const format_1 = __importDefault(require("./middleware/format"));
-const models_1 = __importDefault(require("./models"));
 const api_1 = __importDefault(require("./controllers/api"));
 const theme_1 = __importDefault(require("./controllers/theme"));
-const scripts_1 = __importDefault(require("./scripts"));
-// tslint:disable-next-line
-const Options_1 = __importDefault(require("./Options"));
 const lib_1 = require("./lib");
+const errors_1 = __importDefault(require("./middleware/errors"));
+const format_1 = __importDefault(require("./middleware/format"));
+const raml_1 = __importDefault(require("./middleware/raml"));
+const models_1 = __importDefault(require("./models"));
+const Options_1 = __importDefault(require("./Options"));
+const scripts_1 = __importDefault(require("./scripts"));
+const listEndPoints = require('express-list-endpoints');
 const DEFAULT_PORT = 8080;
 var Router_1 = require("./Router");
 exports.Route = Router_1.Route;

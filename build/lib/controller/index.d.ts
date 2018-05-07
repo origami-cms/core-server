@@ -1,6 +1,6 @@
 import { Origami } from 'origami-core-lib';
 import { Route } from '../../Router';
-export declare type methods = 'get' | 'head' | 'post' | 'put' | 'delete';
+export declare type methods = 'get' | 'head' | 'post' | 'put' | 'delete' | 'list';
 export interface ControllerOptions {
     model: Origami.Store.Schema;
     auth?: boolean | {
@@ -13,6 +13,7 @@ export default class Controller {
     options: ControllerOptions;
     resourcePlural: string;
     router: Route;
+    subRouter: Route;
     constructor(resource: string, store: any, options: ControllerOptions);
     /**
      * Get the ID of the request
@@ -25,4 +26,5 @@ export default class Controller {
     put(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction): Promise<void>;
     delete(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction): Promise<void>;
     private _getModel(req, res);
+    private _auth(req, res, next);
 }

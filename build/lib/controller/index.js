@@ -12,20 +12,22 @@ class Controller {
         this.store = store;
         this.options = options;
         this.resourcePlural = pluralize(resource);
-        this.router = new Router_1.Route(`/api/v1/${this.resourcePlural}`);
-        this.store.model(resource, options.model);
+        this.resource = pluralize.singular(resource);
+        this.router = new Router_1.Route(`/api/v1/${this.resourcePlural}`)
+            .position('store');
+        this.subRouter = this.router.route(`/:${this.resource}Id`)
+            .position('store');
         ['get', 'post', 'delete', 'put'].forEach(m => {
             const rMethod = this.router[m];
             const cMethod = this[m];
-            let useAuth = false;
-            if (this.options.auth) {
-                if (this.options.auth === true)
-                    useAuth = true;
-                else if (this.options.auth[m])
-                    useAuth = true;
-            }
-            rMethod.bind(this.router)(useAuth ? auth_1.default : null, cMethod.bind(this));
+            rMethod.bind(this.router)(this._auth.bind(this), cMethod.bind(this));
         });
+        ['get'].forEach(m => {
+            const rMethod = this.subRouter[m];
+            const cMethod = this[m];
+            rMethod.bind(this.subRouter)(this._auth.bind(this), cMethod.bind(this));
+        });
+        this.store.model(resource, options.model);
     }
     /**
      * Get the ID of the request
@@ -36,20 +38,24 @@ class Controller {
         return req.params[`${this.resource}Id`];
     }
     async get(req, res, next) {
+        console.log('getting');
         // If there is already data passed, skip
         if (res.data)
             return next();
+        console.log('getting start');
         let model;
         let resourceId;
         try {
             ({ model, resourceId } = await this._getModel(req, res));
         }
         catch (e) {
+            console.log(e);
             if (next)
                 return next(e);
             throw e;
         }
         const filter = resourceId ? { id: resourceId } : null;
+        console.log(filter);
         const data = await model.find(filter);
         // If getting a single resource, and there is none, 404
         if (!data && resourceId)
@@ -105,6 +111,26 @@ class Controller {
         const resourceId = await this.id(req);
         const model = await res.app.get('store').model(this.resource);
         return { resourceId, model };
+    }
+    _auth(req, res, next) {
+        let useAuth = null;
+        const m = req.method.toLowerCase();
+        if (this.options.auth) {
+            if (this.options.auth === true) {
+                useAuth = true;
+            }
+            else {
+                let set = this.options.auth[m];
+                if (!this.id(req) && m === 'get')
+                    set = this.options.auth['list'];
+                if (set || set === false)
+                    useAuth = set;
+            }
+        }
+        if (useAuth === null || useAuth)
+            return auth_1.default(req, res, next);
+        console.log('end');
+        next();
     }
 }
 exports.default = Controller;

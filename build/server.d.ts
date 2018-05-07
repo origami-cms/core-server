@@ -1,8 +1,8 @@
 /// <reference types="express" />
 import { Application } from 'express';
 import { Origami } from 'origami-core-lib';
-import { Route } from './Router';
 import { ControllerOptions } from './lib/controller';
+import { Route } from './Router';
 export { Route } from './Router';
 export default class Server {
     app: Application;
