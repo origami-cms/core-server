@@ -7,6 +7,7 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const express_1 = __importDefault(require("express"));
 const helmet_1 = __importDefault(require("helmet"));
 const origami_core_lib_1 = require("origami-core-lib");
+const path_1 = __importDefault(require("path"));
 const api_1 = __importDefault(require("./controllers/api"));
 const theme_1 = __importDefault(require("./controllers/theme"));
 const lib_1 = require("./lib");
@@ -68,6 +69,7 @@ class Server {
         models_1.default(this.store);
         this.app.set('store', this.store);
         this.app.use(helmet_1.default());
+        await this._setupStatic();
         // Generate the position routers...
         await this._generatePositions();
         // Const content = await require('origami-core-server-content')();
@@ -161,6 +163,18 @@ class Server {
         // PRE-SEND position
         this._position('pre-send');
         this.app.use(await format_1.default());
+    }
+    async _setupStatic() {
+        const s = this._options.static;
+        if (s) {
+            if (typeof s === 'string') {
+                console.log(2, path_1.default.resolve(process.cwd(), s));
+                this.static(path_1.default.resolve(process.cwd(), s));
+            }
+            else if (s instanceof Array) {
+                s.forEach(_s => this.static(path_1.default.resolve(process.cwd(), _s)));
+            }
+        }
     }
     // Run the middleware for the router position
     _position(pos) {

@@ -2,6 +2,7 @@ import bodyParser from 'body-parser';
 import express, {Application, NextFunction, Request, Response, Router} from 'express';
 import helmet from 'helmet';
 import {config, error, Origami, requireKeys, success} from 'origami-core-lib';
+import path from 'path';
 
 import api from './controllers/api';
 import theme from './controllers/theme';
@@ -103,6 +104,7 @@ export default class Server {
         this.app.set('store', this.store);
         this.app.use(helmet());
 
+        await this._setupStatic();
         // Generate the position routers...
         await this._generatePositions();
         // Const content = await require('origami-core-server-content')();
@@ -113,8 +115,11 @@ export default class Server {
         // Setup the middleware
         await this._setupMiddleware();
 
+
+
         // Serve the app
         this.serve();
+
     }
 
 
@@ -237,6 +242,19 @@ export default class Server {
         // PRE-SEND position
         this._position('pre-send');
         this.app.use(await mwFormat());
+    }
+
+    private async _setupStatic() {
+        const s = this._options.static;
+        if (s) {
+            if (typeof s === 'string') {
+                console.log(2, path.resolve(process.cwd(), s));
+
+                this.static(path.resolve(process.cwd(), s));
+            } else if (s instanceof Array) {
+                s.forEach(_s => this.static(path.resolve(process.cwd(), _s)));
+            }
+        }
     }
 
     // Run the middleware for the router position

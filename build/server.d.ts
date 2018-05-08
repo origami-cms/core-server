@@ -20,5 +20,6 @@ export default class Server {
     list(): void;
     private _generatePositions();
     private _setupMiddleware();
+    private _setupStatic();
     private _position(pos);
 }
