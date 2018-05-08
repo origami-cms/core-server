@@ -38,11 +38,9 @@ class Controller {
         return req.params[`${this.resource}Id`];
     }
     async get(req, res, next) {
-        console.log('getting');
         // If there is already data passed, skip
         if (res.data)
             return next();
-        console.log('getting start');
         let model;
         let resourceId;
         try {
@@ -55,13 +53,12 @@ class Controller {
             throw e;
         }
         const filter = resourceId ? { id: resourceId } : null;
-        console.log(filter);
         const data = await model.find(filter);
         // If getting a single resource, and there is none, 404
         if (!data && resourceId)
-            return next(new Error(`${this.resourcePlural}.errors.notFound`));
+            return next(new Error('resource.errors.notFound'));
         res.data = data;
-        res.responseCode = `${this.resourcePlural}.success.${resourceId ? 'getOne' : 'getList'}`;
+        res.responseCode = `resource.success.${resourceId ? 'getOne' : 'getList'}`;
         if (next)
             await next();
     }
