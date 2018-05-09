@@ -39,8 +39,12 @@ exports.default = () => {
             if (typeof req.headers.accept !== 'string') {
                 throw new Error('accept header should be a string');
             }
-            if (req.headers.accept.includes('text/html'))
-                res.redirect('/404');
+            if (req.headers.accept.includes('text/html')) {
+                if (req.url === '/404')
+                    res.send('Not found');
+                else
+                    res.redirect('/404');
+            }
             else
                 res.send();
         }
