@@ -23,7 +23,7 @@
     "lodash": "^4.17.4",
     "marked": "^0.3.6",
     "npm-programmatic": "^0.0.10",
-    "origami-core-lib": "^0.1.7",
+    "origami-core-lib": "^0.2.0",
     "origami-core-server-statuses": "^0.0.6",
     "osprey": "^0.5.0",
     "pluralize": "^7.0.0",
