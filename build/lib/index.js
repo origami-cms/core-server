@@ -8,6 +8,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 const _npm = __importStar(require("./npm"));
-var controller_1 = require("./controller");
-exports.Controller = controller_1.default;
+var resource_1 = require("./resource");
+exports.Resource = resource_1.default;
 exports.NPM = _npm;

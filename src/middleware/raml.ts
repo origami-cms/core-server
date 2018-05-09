@@ -29,9 +29,8 @@ export default async(): Promise<RequestHandler> => {
 
     const fn = (req: Origami.Server.Request, res: Origami.Server.Response, next: NextFunction) => {
         middleware(req, res, async err => {
-            console.log(err);
-
             if (err) {
+                console.log(err);
                 try {
                     res.data = err.requestErrors.map((e: OspreyRequestError)  => ({
                         type: e.type,

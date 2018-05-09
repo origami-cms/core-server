@@ -78,6 +78,7 @@ class Server {
         // );
         // Setup the middleware
         await this._setupMiddleware();
+        await this._setupResources();
         // Serve the app
         this.serve();
     }
@@ -106,8 +107,8 @@ class Server {
         });
         router.nested.forEach(this.useRouter.bind(this));
     }
-    controller(resource, options) {
-        const c = new lib_1.Controller(resource, this.store, options);
+    resource(name, options) {
+        const c = new lib_1.Resource(name, this.store, options);
         this.useRouter(c.router);
     }
     // Wrapper for express.static
@@ -174,6 +175,25 @@ class Server {
             else if (s instanceof Array) {
                 s.forEach(_s => this.static(path_1.default.resolve(process.cwd(), _s)));
             }
+        }
+    }
+    async _setupResources() {
+        const c = await origami_core_lib_1.config.read();
+        if (!c)
+            return;
+        if (c.resources) {
+            Object.entries(c.resources).forEach(([name, r]) => {
+                if (typeof r === 'string') {
+                    const model = require(path_1.default.resolve(process.cwd(), r));
+                    const auth = true;
+                    this.resource(name, { model, auth });
+                }
+                else if (r instanceof Object) {
+                    const model = require(path_1.default.resolve(process.cwd(), r.model));
+                    const auth = r.auth;
+                    this.resource(name, { model, auth });
+                }
+            });
         }
     }
     // Run the middleware for the router position

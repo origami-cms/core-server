@@ -23,7 +23,7 @@
     "lodash": "^4.17.4",
     "marked": "^0.3.6",
     "npm-programmatic": "^0.0.10",
-    "origami-core-lib": "^0.2.0",
+    "origami-core-lib": "^0.3.0",
     "origami-core-server-statuses": "^0.0.6",
     "osprey": "^0.5.0",
     "pluralize": "^7.0.0",
@@ -44,7 +44,7 @@
     "@types/pug": "^2.0.4",
     "@types/recursive-readdir": "^2.2.0",
     "@types/request-promise-native": "^1.0.14",
-    "tslint": "^5.9.1",
+    "tslint": "^5.10.0",
     "tslint-config-origami": "^1.0.0",
     "typescript": "^2.7.2"
   }

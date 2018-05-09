@@ -6,8 +6,8 @@ import path from 'path';
 
 import api from './controllers/api';
 import theme from './controllers/theme';
-import {Controller} from './lib';
-import {ControllerOptions} from './lib/controller';
+import {Resource} from './lib';
+import {ResourceOptions} from './lib/resource';
 import mwErrors from './middleware/errors';
 import mwFormat from './middleware/format';
 import mwRaml from './middleware/raml';
@@ -116,6 +116,8 @@ export default class Server {
         await this._setupMiddleware();
 
 
+        await this._setupResources();
+
 
         // Serve the app
         this.serve();
@@ -161,8 +163,8 @@ export default class Server {
     }
 
 
-    controller(resource: string, options: ControllerOptions) {
-        const c = new Controller(resource, this.store, options);
+    resource(name: string, options: ResourceOptions) {
+        const c = new Resource(name, this.store, options);
         this.useRouter(c.router);
     }
 
@@ -254,6 +256,27 @@ export default class Server {
             } else if (s instanceof Array) {
                 s.forEach(_s => this.static(path.resolve(process.cwd(), _s)));
             }
+        }
+    }
+
+
+    private async _setupResources() {
+        const c = await config.read();
+
+        if (!c) return;
+        if (c.resources) {
+            Object.entries(c.resources).forEach(([name, r]) => {
+                if (typeof r === 'string') {
+                    const model = require(path.resolve(process.cwd(), r));
+                    const auth = true;
+                    this.resource(name, {model, auth});
+
+                } else if (r instanceof Object) {
+                    const model = require(path.resolve(process.cwd(), r.model));
+                    const auth = r.auth;
+                    this.resource(name, {model, auth});
+                }
+            });
         }
     }
 

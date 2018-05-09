@@ -6,7 +6,7 @@ import auth from '../../middleware/auth';
 
 export type methods = 'get' | 'head' | 'post' | 'put' | 'delete' | 'list';
 
-export interface ControllerOptions {
+export interface ResourceOptions {
     model: Origami.Store.Schema;
     auth?: boolean | {
         [key in methods]: boolean
@@ -14,13 +14,13 @@ export interface ControllerOptions {
 }
 
 
-export default class Controller {
+export default class Resource {
     resourcePlural: string;
     router: Route;
     subRouter: Route;
 
 
-    constructor(public resource: string, public store: any, public options: ControllerOptions) {
+    constructor(public resource: string, public store: any, public options: ResourceOptions) {
         this.resourcePlural = pluralize(resource);
         this.resource = pluralize.singular(resource);
 
@@ -33,14 +33,14 @@ export default class Controller {
 
         (['get', 'post', 'delete', 'put'] as methods[]).forEach(m => {
             const rMethod = this.router[m as keyof Route] as Function;
-            const cMethod = this[m as keyof Controller] as Function;
+            const cMethod = this[m as keyof Resource] as Function;
 
             rMethod.bind(this.router)(this._auth.bind(this), cMethod.bind(this));
         });
 
         (['get'] as methods[]).forEach(m => {
             const rMethod = this.subRouter[m as keyof Route] as Function;
-            const cMethod = this[m as keyof Controller] as Function;
+            const cMethod = this[m as keyof Resource] as Function;
 
             rMethod.bind(this.subRouter)(this._auth.bind(this), cMethod.bind(this));
         });
@@ -74,8 +74,6 @@ export default class Controller {
         try {
             ({model, resourceId} = await this._getModel(req, res));
         } catch (e) {
-            console.log(e);
-
             if (next) return next(e);
             throw e;
         }
@@ -173,7 +171,6 @@ export default class Controller {
 
 
         if (useAuth === null || useAuth) return auth(req, res, next);
-        console.log('end');
         next() ;
     }
 }

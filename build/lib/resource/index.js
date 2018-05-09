@@ -1,12 +1,12 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+}
 Object.defineProperty(exports, "__esModule", { value: true });
 const Router_1 = require("../../Router");
 const pluralize = require('pluralize');
 const auth_1 = __importDefault(require("../../middleware/auth"));
-class Controller {
+class Resource {
     constructor(resource, store, options) {
         this.resource = resource;
         this.store = store;
@@ -47,7 +47,6 @@ class Controller {
             ({ model, resourceId } = await this._getModel(req, res));
         }
         catch (e) {
-            console.log(e);
             if (next)
                 return next(e);
             throw e;
@@ -126,8 +125,7 @@ class Controller {
         }
         if (useAuth === null || useAuth)
             return auth_1.default(req, res, next);
-        console.log('end');
         next();
     }
 }
-exports.default = Controller;
+exports.default = Resource;

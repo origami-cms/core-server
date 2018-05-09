@@ -22,8 +22,8 @@ exports.default = async () => {
     }
     const fn = (req, res, next) => {
         middleware(req, res, async (err) => {
-            console.log(err);
             if (err) {
+                console.log(err);
                 try {
                     res.data = err.requestErrors.map((e) => ({
                         type: e.type,
