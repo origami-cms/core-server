@@ -120,6 +120,7 @@ export default class Server {
 
 
         await this._setupResources();
+        await this._setupPlugins();
 
 
         // Serve the app
@@ -267,6 +268,7 @@ export default class Server {
         const c = await config.read();
 
         if (!c) return;
+
         if (c.resources) {
             Object.entries(c.resources).forEach(([name, r]) => {
                 if (typeof r === 'string') {
@@ -278,6 +280,23 @@ export default class Server {
                     const model = require(path.resolve(process.cwd(), r.model));
                     const auth = r.auth;
                     this.resource(name, {model, auth});
+                }
+            });
+        }
+    }
+
+    private async _setupPlugins() {
+        const c = await config.read();
+
+        if (!c) return;
+
+        if (c.plugins) {
+            Object.entries(c.plugins).forEach(([name, settings]) => {
+                if (Boolean(settings)) {
+                    const app = require(`origami-plugin-${name}`);
+
+                    if (settings === true) app(this);
+                    else if (settings instanceof Object) app(this, settings);
                 }
             });
         }

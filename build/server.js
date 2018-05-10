@@ -28,9 +28,12 @@ class Server {
         this.admin = admin;
         // Assign these to a singleton class so they can be use across the server
         this._options = Object.assign({
-            port: process.env.NODE_ENV || DEFAULT_PORT,
+            port: process.env.PORT || DEFAULT_PORT,
             ln: 'enUS'
         }, options);
+        // Special override for PORT in the environment variable
+        if (process.env.PORT)
+            this._options.port = parseInt(process.env.PORT, 10);
         Options_1.default.options = this._options;
         // Different positions to run route at
         this._positions = [
@@ -79,6 +82,7 @@ class Server {
         // Setup the middleware
         await this._setupMiddleware();
         await this._setupResources();
+        await this._setupPlugins();
         // Serve the app
         this.serve();
     }
@@ -192,6 +196,22 @@ class Server {
                     const model = require(path_1.default.resolve(process.cwd(), r.model));
                     const auth = r.auth;
                     this.resource(name, { model, auth });
+                }
+            });
+        }
+    }
+    async _setupPlugins() {
+        const c = await origami_core_lib_1.config.read();
+        if (!c)
+            return;
+        if (c.plugins) {
+            Object.entries(c.plugins).forEach(([name, settings]) => {
+                if (Boolean(settings)) {
+                    const app = require(`origami-plugin-${name}`);
+                    if (settings === true)
+                        app(this);
+                    else if (settings instanceof Object)
+                        app(this, settings);
                 }
             });
         }

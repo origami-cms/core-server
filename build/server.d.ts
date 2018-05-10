@@ -22,5 +22,6 @@ export default class Server {
     private _setupMiddleware();
     private _setupStatic();
     private _setupResources();
+    private _setupPlugins();
     private _position(pos);
 }
