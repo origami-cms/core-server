@@ -46,10 +46,13 @@ export default class Server {
         // Assign these to a singleton class so they can be use across the server
         this._options = {
             ... {
-                port: process.env.NODE_ENV || DEFAULT_PORT,
+                port: process.env.PORT || DEFAULT_PORT,
                 ln: 'enUS'
             }, ...options
         };
+        // Special override for PORT in the environment variable
+        if (process.env.PORT) this._options.port = parseInt(process.env.PORT, 10);
+
         Options.options = this._options;
 
 
