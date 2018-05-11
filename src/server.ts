@@ -6,6 +6,7 @@ import path from 'path';
 
 import api from './controllers/api';
 import theme from './controllers/theme';
+import * as plugins from './plugins';
 import {Resource} from './lib';
 import {ResourceOptions} from './lib/resource';
 import mwErrors from './middleware/errors';
@@ -288,9 +289,7 @@ export default class Server {
     private async _setupPlugins() {
         const c = await config.read();
 
-        if (!c) return;
-
-        if (c.plugins) {
+        if (c && c.plugins) {
             Object.entries(c.plugins).forEach(([name, settings]) => {
                 if (Boolean(settings)) {
                     const app = require(`origami-plugin-${name}`);
@@ -300,6 +299,10 @@ export default class Server {
                 }
             });
         }
+
+        Object.entries(plugins).forEach(([name, plugin]) => {
+            plugin(this);
+        });
     }
 
     // Run the middleware for the router position
