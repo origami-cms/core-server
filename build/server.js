@@ -21,7 +21,6 @@ const plugins = __importStar(require("./plugins"));
 const lib_1 = require("./lib");
 const errors_1 = __importDefault(require("./middleware/errors"));
 const format_1 = __importDefault(require("./middleware/format"));
-const raml_1 = __importDefault(require("./middleware/raml"));
 const models_1 = __importDefault(require("./models"));
 const Options_1 = __importDefault(require("./Options"));
 const scripts_1 = __importDefault(require("./scripts"));
@@ -77,7 +76,7 @@ class Server {
     // Registers all the middleware and serves the app
     async _setup() {
         // Setup the store
-        models_1.default(this.store);
+        models_1.default(this);
         this.app.set('store', this.store);
         this.app.use(helmet_1.default());
         await this._setupStatic();
@@ -161,8 +160,6 @@ class Server {
         this.app.use(body_parser_1.default.json());
         // Setup admin
         this.app.use('/admin/', this.admin());
-        // Validate the API against the RAML
-        this.app.use('/api/v1', await raml_1.default());
         // PRE-STORE position
         this._position('pre-store');
         this._position('store');
@@ -221,7 +218,6 @@ class Server {
                 }
             });
         }
-        console.log('setup');
         Object.entries(plugins).forEach(([name, plugin]) => {
             plugin(this);
         });

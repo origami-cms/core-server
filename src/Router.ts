@@ -1,4 +1,7 @@
 import {Origami} from 'origami-core-lib';
+import path from 'path';
+import fs from 'fs';
+import recursive from 'recursive-readdir';
 
 export type Routers = {
     [K in Origami.Server.Position]: RouterListItem[]
@@ -117,6 +120,36 @@ export class Route {
         this.nested.push(r);
 
         return r;
+    }
+
+    /**
+     * Load all routers from a file or directory and nest them
+     * @param path Path to file or directory
+     * @param prefix Prefix the route
+     * @param recursive If true, recursively nest routes
+     */
+    async include(p: string, prefix: string = '/', r: Boolean = true) {
+        const nest = (_p: string) => {
+            const route = require(_p);
+            if (route instanceof Route) return this.nested.push(route);
+            return false;
+        };
+
+        const stat = await fs.statSync(p);
+
+        if (stat.isFile()) return nest(p);
+
+        if (stat.isDirectory()) {
+            const list = fs.readdirSync(p);
+            list.forEach(i => {
+                const pathRel = path.resolve(p, i);
+                const s = fs.statSync(pathRel);
+                if (s.isFile() && /.*\.js$/.test(i)) return nest(pathRel);
+                if (r && s.isDirectory()) return this.include(pathRel, `${p}/${i}`);
+                return false;
+            });
+
+        } else return false;
     }
 
 

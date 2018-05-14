@@ -11,7 +11,6 @@ import {Resource} from './lib';
 import {ResourceOptions} from './lib/resource';
 import mwErrors from './middleware/errors';
 import mwFormat from './middleware/format';
-import mwRaml from './middleware/raml';
 import models from './models';
 import Options from './Options';
 import {Route, RouterListItem} from './Router';
@@ -41,6 +40,7 @@ export default class Server {
     constructor(options: Origami.ConfigServer, store: any, admin: Function) {
         this.app = express();
         this.store = store;
+
         this.admin = admin;
 
 
@@ -104,7 +104,7 @@ export default class Server {
     // Registers all the middleware and serves the app
     private async _setup() {
         // Setup the store
-        models(this.store);
+        models(this);
         this.app.set('store', this.store);
         this.app.use(helmet());
 
@@ -224,10 +224,6 @@ export default class Server {
 
         // Setup admin
         this.app.use('/admin/', this.admin());
-
-
-        // Validate the API against the RAML
-        this.app.use('/api/v1', await mwRaml());
 
 
         // PRE-STORE position

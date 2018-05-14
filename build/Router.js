@@ -1,5 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+}
 Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 class Route {
     constructor(url = null, parent) {
         this._curposition = 'init';
@@ -78,6 +83,37 @@ class Route {
         r.position(this._position);
         this.nested.push(r);
         return r;
+    }
+    /**
+     * Load all routers from a file or directory and nest them
+     * @param path Path to file or directory
+     * @param prefix Prefix the route
+     * @param recursive If true, recursively nest routes
+     */
+    async include(p, prefix = '/', r = true) {
+        const nest = (_p) => {
+            const route = require(_p);
+            if (route instanceof Route)
+                return this.nested.push(route);
+            return false;
+        };
+        const stat = await fs_1.default.statSync(p);
+        if (stat.isFile())
+            return nest(p);
+        if (stat.isDirectory()) {
+            const list = fs_1.default.readdirSync(p);
+            list.forEach(i => {
+                const pathRel = path_1.default.resolve(p, i);
+                const s = fs_1.default.statSync(pathRel);
+                if (s.isFile() && /.*\.js$/.test(i))
+                    return nest(pathRel);
+                if (r && s.isDirectory())
+                    return this.include(pathRel, `${p}/${i}`);
+                return false;
+            });
+        }
+        else
+            return false;
     }
     // Registers the activeRouter (set by position()) to handle on the url
     _route(method, ...handlers) {

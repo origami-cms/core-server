@@ -26,5 +26,12 @@ export declare class Route {
     use(...handlers: Origami.Server.RequestHandler[]): this;
     position(position: Origami.Server.Position): this;
     route(path: Origami.Server.URL): Route;
+    /**
+     * Load all routers from a file or directory and nest them
+     * @param path Path to file or directory
+     * @param prefix Prefix the route
+     * @param recursive If true, recursively nest routes
+     */
+    include(p: string, prefix?: string, r?: Boolean): Promise<number | false | undefined>;
     private _route(method, ...handlers);
 }

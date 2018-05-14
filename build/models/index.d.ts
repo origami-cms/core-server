@@ -1,3 +1,3 @@
-import { Origami } from 'origami-core-lib';
-declare const _default: (store: Origami.Store.Store) => void;
+import Server from '../server';
+declare const _default: (server: Server) => void;
 export default _default;
