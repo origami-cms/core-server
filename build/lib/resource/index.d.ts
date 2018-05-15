@@ -18,7 +18,7 @@ export default class Resource {
     /**
      * Get the ID of the request
      * @param {Request} req Request object
-     * @return {String} Built from RAML
+     * @return {String}
      */
     id(req: Origami.Server.Request): any;
     get(req: Origami.Server.Request, res: Origami.Server.Response, next: Origami.Server.NextFunction): Promise<void>;

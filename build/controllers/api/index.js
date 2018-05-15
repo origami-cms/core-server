@@ -7,7 +7,6 @@ const path_1 = __importDefault(require("path"));
 const Router_1 = require("../../Router");
 const auth_1 = require("../../lib/auth");
 exports.default = async () => {
-    console.log('here');
     const route = new Router_1.Route('/api/v1');
     // If the body has a password, hash it for all routes
     route

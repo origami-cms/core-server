@@ -52,7 +52,7 @@ export default class Resource {
     /**
      * Get the ID of the request
      * @param {Request} req Request object
-     * @return {String} Built from RAML
+     * @return {String}
      */
     id(req: Origami.Server.Request) {
         return req.params[`${this.resource}Id`];
