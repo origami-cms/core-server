@@ -31,14 +31,14 @@ export default class Resource {
             .position('store');
 
 
-        (['get', 'post', 'delete', 'put'] as methods[]).forEach(m => {
+        (['get', 'post'] as methods[]).forEach(m => {
             const rMethod = this.router[m as keyof Route] as Function;
             const cMethod = this[m as keyof Resource] as Function;
 
             rMethod.bind(this.router)(this._auth.bind(this), cMethod.bind(this));
         });
 
-        (['get'] as methods[]).forEach(m => {
+        (['get', 'delete', 'put'] as methods[]).forEach(m => {
             const rMethod = this.subRouter[m as keyof Route] as Function;
             const cMethod = this[m as keyof Resource] as Function;
 
@@ -87,7 +87,7 @@ export default class Resource {
 
         res.data = data;
 
-        res.responseCode = `resource.success.${resourceId ? 'getOne' : 'getList'}`;
+        res.responseCode = `resource.success.${resourceId ? 'foundOne' : 'foundList'}`;
         if (next) await next();
     }
 
@@ -100,7 +100,7 @@ export default class Resource {
         try {
             const {model} = await this._getModel(req, res);
             res.data = await model.create(req.body);
-            res.responseCode = `${this.resourcePlural}.success.create`;
+            res.responseCode = 'resource.success.created';
         } catch (e) {
             if (next) await next(e);
             else throw e;
@@ -117,6 +117,7 @@ export default class Resource {
         try {
             const {model, resourceId} = await this._getModel(req, res);
             res.data = await model.update(resourceId, req.body);
+            res.responseCode = 'resource.success.updated';
         } catch (e) {
             if (next) return next(e);
             throw e;
@@ -132,7 +133,9 @@ export default class Resource {
     ) {
         try {
             const {model, resourceId} = await this._getModel(req, res);
-            res.data = await model.delete(resourceId);
+            await model.delete(resourceId);
+            res.responseCode = 'resource.success.deleted';
+            delete res.data;
         } catch (e) {
             if (next) return next(e);
             throw e;

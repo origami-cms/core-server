@@ -17,12 +17,12 @@ class Resource {
             .position('store');
         this.subRouter = this.router.route(`/:${this.resource}Id`)
             .position('store');
-        ['get', 'post', 'delete', 'put'].forEach(m => {
+        ['get', 'post'].forEach(m => {
             const rMethod = this.router[m];
             const cMethod = this[m];
             rMethod.bind(this.router)(this._auth.bind(this), cMethod.bind(this));
         });
-        ['get'].forEach(m => {
+        ['get', 'delete', 'put'].forEach(m => {
             const rMethod = this.subRouter[m];
             const cMethod = this[m];
             rMethod.bind(this.subRouter)(this._auth.bind(this), cMethod.bind(this));
@@ -57,7 +57,7 @@ class Resource {
         if (!data && resourceId)
             return next(new Error('resource.errors.notFound'));
         res.data = data;
-        res.responseCode = `resource.success.${resourceId ? 'getOne' : 'getList'}`;
+        res.responseCode = `resource.success.${resourceId ? 'foundOne' : 'foundList'}`;
         if (next)
             await next();
     }
@@ -65,7 +65,7 @@ class Resource {
         try {
             const { model } = await this._getModel(req, res);
             res.data = await model.create(req.body);
-            res.responseCode = `${this.resourcePlural}.success.create`;
+            res.responseCode = 'resource.success.created';
         }
         catch (e) {
             if (next)
@@ -80,6 +80,7 @@ class Resource {
         try {
             const { model, resourceId } = await this._getModel(req, res);
             res.data = await model.update(resourceId, req.body);
+            res.responseCode = 'resource.success.updated';
         }
         catch (e) {
             if (next)
@@ -93,7 +94,9 @@ class Resource {
     async delete(req, res, next) {
         try {
             const { model, resourceId } = await this._getModel(req, res);
-            res.data = await model.delete(resourceId);
+            await model.delete(resourceId);
+            res.responseCode = 'resource.success.deleted';
+            delete res.data;
         }
         catch (e) {
             if (next)

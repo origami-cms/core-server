@@ -18,7 +18,7 @@ export default (res: Origami.Server.Response, message: string, code: number): st
 
     // Destructure the code and message from an array
     // EG: notFound: ['No resource found', 404]
-    if (m instanceof Array) [m,c] = m;
+    if (m instanceof Array) [m, c] = m;
     if (!m) m = 'Unknown error';
 
     res.status(c);

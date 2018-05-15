@@ -19,5 +19,12 @@ exports.default = async () => {
         next();
     });
     route.include(path_1.default.resolve(__dirname, './v1'), '/', true);
+    route
+        .position('post-store')
+        .use((req, res, next) => {
+        if (!res.data || res.body)
+            res.responseCode = 'general.errors.notFound';
+        next();
+    });
     return route;
 };
