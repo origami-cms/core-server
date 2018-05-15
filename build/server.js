@@ -221,7 +221,6 @@ class Server {
                 }
             });
         }
-        console.log('setup');
         Object.entries(plugins).forEach(([name, plugin]) => {
             plugin(this);
         });

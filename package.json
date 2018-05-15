@@ -8,7 +8,7 @@
   "typings": "build/server.d.ts",
   "scripts": {
     "lint": "tslint -p . --fix",
-    "start": "tsc --watch",
+    "watch": "tsc --watch",
     "build": "tsc"
   },
   "dependencies": {
