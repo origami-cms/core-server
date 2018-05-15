@@ -251,8 +251,6 @@ export default class Server {
         const s = this._options.static;
         if (s) {
             if (typeof s === 'string') {
-                console.log(2, path.resolve(process.cwd(), s));
-
                 this.static(path.resolve(process.cwd(), s));
             } else if (s instanceof Array) {
                 s.forEach(_s => this.static(path.resolve(process.cwd(), _s)));

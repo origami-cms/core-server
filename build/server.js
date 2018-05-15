@@ -178,7 +178,6 @@ class Server {
         const s = this._options.static;
         if (s) {
             if (typeof s === 'string') {
-                console.log(2, path_1.default.resolve(process.cwd(), s));
                 this.static(path_1.default.resolve(process.cwd(), s));
             }
             else if (s instanceof Array) {
