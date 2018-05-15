@@ -4,8 +4,6 @@ import {passwordHash} from '../../lib/auth';
 
 
 export default async() => {
-    console.log('here');
-
     const route = new Route('/api/v1');
 
     // If the body has a password, hash it for all routes

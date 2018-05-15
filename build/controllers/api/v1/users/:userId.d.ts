@@ -1,2 +1,3 @@
 import { Origami } from 'origami-core-lib';
-export declare const get: (controller: any) => Origami.Server.RequestHandler;
+import { Resource } from '../../../../lib';
+export declare const get: (controller: Resource) => Origami.Server.RequestHandler;
