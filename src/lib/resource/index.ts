@@ -35,14 +35,20 @@ export default class Resource {
             const rMethod = this.router[m as keyof Route] as Function;
             const cMethod = this[m as keyof Resource] as Function;
 
-            rMethod.bind(this.router)(this._auth.bind(this), cMethod.bind(this));
+            rMethod.bind(this.router)(
+                this._auth.bind(this),
+                cMethod.bind(this)
+            );
         });
 
         (['get', 'delete', 'put'] as methods[]).forEach(m => {
             const rMethod = this.subRouter[m as keyof Route] as Function;
             const cMethod = this[m as keyof Resource] as Function;
 
-            rMethod.bind(this.subRouter)(this._auth.bind(this), cMethod.bind(this));
+            rMethod.bind(this.subRouter)(
+                this._auth.bind(this),
+                cMethod.bind(this)
+            );
         });
 
 

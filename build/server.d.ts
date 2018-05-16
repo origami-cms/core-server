@@ -17,7 +17,6 @@ export default class Server {
     useRouter(router: Route): void;
     resource(name: string, options: ResourceOptions): void;
     static(path: string): void;
-    list(): void;
     private _generatePositions();
     private _setupMiddleware();
     private _setupStatic();

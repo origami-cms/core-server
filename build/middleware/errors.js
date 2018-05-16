@@ -8,7 +8,6 @@ const status_1 = __importDefault(require("../lib/status"));
 exports.default = (async (err, req, res, next) => {
     const errCode = 500;
     if (err) {
-        console.log(err);
         const message = status_1.default(res, err.message, errCode);
         if (!res.data && err.data)
             res.data = err.data;

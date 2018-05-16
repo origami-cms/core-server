@@ -111,7 +111,6 @@ class Server {
                     origami_core_lib_1.success('Server', `Conected ${p} route: `, method.toUpperCase().blue, p.blue);
                 }
                 catch (e) {
-                    console.log(e);
                     origami_core_lib_1.error('Server', new Error(`Could not connect ${method.toUpperCase().yellow} ${p.yellow}`));
                 }
             });
@@ -125,13 +124,6 @@ class Server {
     // Wrapper for express.static
     static(path) {
         this.app.use(express_1.default.static(path));
-    }
-    // Lists all the endpoints and their methods
-    list() {
-        listEndPoints(this.app).forEach(({ methods: [m], path: p }) => {
-            const _m = `     ${m}`.slice(-1 * 'DELETE'.length);
-            console.log(' '.repeat(2), _m.toUpperCase().grey, p.magenta);
-        });
     }
     async _generatePositions() {
         // Setup API
@@ -223,10 +215,7 @@ class Server {
     }
     // Run the middleware for the router position
     _position(pos) {
-        this.app.use((req, res, next) => {
-            // console.log(req.method.yellow, req.url.yellow, pos.grey);
-            next();
-        }, this._positionRouters[pos]);
+        this.app.use(this._positionRouters[pos]);
     }
 }
 exports.default = Server;

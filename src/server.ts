@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
 import express, {Application, NextFunction, Request, Response, Router} from 'express';
 import helmet from 'helmet';
-import {config, error, Origami, requireKeys, success} from 'origami-core-lib';
+import {config, error, Origami, requireKeys, success, info} from 'origami-core-lib';
 import path from 'path';
 
 import api from './controllers/api';
@@ -156,7 +156,6 @@ export default class Server {
                     (pr[m] as Function)(path, handlers);
                     success('Server', `Conected ${p} route: `, method.toUpperCase().blue, p.blue);
                 } catch (e) {
-                    console.log(e);
                     error(
                         'Server',
                         new Error(`Could not connect ${method.toUpperCase().yellow} ${p.yellow}`)
@@ -177,19 +176,6 @@ export default class Server {
     static(path: string) {
         this.app.use(express.static(path));
     }
-
-    // Lists all the endpoints and their methods
-    list() {
-        interface endpoint {
-            methods: string[];
-            path: string;
-        }
-        listEndPoints(this.app).forEach(({methods: [m], path: p}: endpoint) => {
-            const _m = `     ${m}`.slice(-1 * 'DELETE'.length);
-            console.log(' '.repeat(2), _m.toUpperCase().grey, p.magenta);
-        });
-    }
-
 
     private async _generatePositions() {
         // Setup API
@@ -301,9 +287,6 @@ export default class Server {
 
     // Run the middleware for the router position
     private _position(pos: Origami.Server.Position) {
-        this.app.use((req: Request, res: Response, next: NextFunction) => {
-            // console.log(req.method.yellow, req.url.yellow, pos.grey);
-            next();
-        }, this._positionRouters[pos]);
+        this.app.use(this._positionRouters[pos]);
     }
 }

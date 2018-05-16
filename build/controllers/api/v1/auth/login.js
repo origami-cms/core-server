@@ -37,6 +37,7 @@ r.post(async (req, res, next) => {
         });
         const { iat: expires } = auth.jwtVerify(token);
         res.data = { token, expires };
+        res.responseCode = 'auth.success.login';
         await next();
     }
     catch (e) {

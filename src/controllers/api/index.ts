@@ -21,7 +21,7 @@ export default async() => {
 
 
     route
-        .position('post-store')
+        .position('pre-render')
         .use((req, res, next) => {
             if (!res.data || res.body) res.responseCode = 'general.errors.notFound';
             next();

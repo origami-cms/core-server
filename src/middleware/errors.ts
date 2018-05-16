@@ -11,7 +11,6 @@ export default (async(
 ) => {
     const errCode = 500;
     if (err) {
-        console.log(err);
         const message = status(res, err.message, errCode);
         if (!res.data && err.data) res.data = err.data;
 
