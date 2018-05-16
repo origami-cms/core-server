@@ -6,6 +6,10 @@ import {resolve} from 'path';
 import findRoot from 'find-root';
 import request from 'request';
 
+const sendDefault = (res: Origami.Server.Response) => {
+    return res.sendFile(resolve(findRoot(__dirname), 'content/profile/default.svg'));
+};
+
 export default (app: Server) => {
     const r = new Route('/content/profiles/:userId');
 
@@ -15,10 +19,11 @@ export default (app: Server) => {
         const m = res.app.get('store').model('user') as Origami.Store.Model;
         const u = await m.find({id: req.params.userId}) as Origami.Store.Resource;
 
-        if (!u) return res.sendFile(resolve(findRoot(__dirname), 'content/profile/default.svg'));
-        const {email} = u;
+        if (!u) return sendDefault(res);
 
-        request(`https://www.gravatar.com/avatar/${md5(email)}.jpg?s=100`).pipe(res);
+        request(`https://www.gravatar.com/avatar/${md5(u.email)}.jpg?s=100`)
+            .on('error', err => sendDefault(res))
+            .pipe(res);
     });
 
     app.useRouter(r);

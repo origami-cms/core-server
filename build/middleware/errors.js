@@ -11,13 +11,13 @@ exports.default = (async (err, req, res, next) => {
         const message = status_1.default(res, err.message, errCode);
         if (!res.data && err.data)
             res.data = err.data;
-        // If (res.statusCode === errCode) {
         if (process.env.NODE_ENV !== 'production' && err.stack) {
             res.data = err.stack.split('\n');
         }
         else
             delete res.data;
-        // }
+        if (process.env.NODE_ENV !== 'production')
+            origami_core_lib_1.error(err);
         origami_core_lib_1.error('Server', new Error(`${req.method} ${req.url.yellow} ${message.red}`));
     }
     await next();

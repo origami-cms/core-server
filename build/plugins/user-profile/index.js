@@ -8,6 +8,9 @@ const md5_1 = __importDefault(require("md5"));
 const path_1 = require("path");
 const find_root_1 = __importDefault(require("find-root"));
 const request_1 = __importDefault(require("request"));
+const sendDefault = (res) => {
+    return res.sendFile(path_1.resolve(find_root_1.default(__dirname), 'content/profile/default.svg'));
+};
 exports.default = (app) => {
     const r = new Router_1.Route('/content/profiles/:userId');
     r.get(async (req, res, next) => {
@@ -16,9 +19,10 @@ exports.default = (app) => {
         const m = res.app.get('store').model('user');
         const u = await m.find({ id: req.params.userId });
         if (!u)
-            return res.sendFile(path_1.resolve(find_root_1.default(__dirname), 'content/profile/default.svg'));
-        const { email } = u;
-        request_1.default(`https://www.gravatar.com/avatar/${md5_1.default(email)}.jpg?s=100`).pipe(res);
+            return sendDefault(res);
+        request_1.default(`https://www.gravatar.com/avatar/${md5_1.default(u.email)}.jpg?s=100`)
+            .on('error', err => sendDefault(res))
+            .pipe(res);
     });
     app.useRouter(r);
 };

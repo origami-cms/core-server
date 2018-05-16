@@ -14,11 +14,11 @@ export default (async(
         const message = status(res, err.message, errCode);
         if (!res.data && err.data) res.data = err.data;
 
-            // If (res.statusCode === errCode) {
         if (process.env.NODE_ENV !== 'production' && err.stack) {
             res.data = err.stack.split('\n');
         } else delete res.data;
-            // }
+
+        if (process.env.NODE_ENV !== 'production') error(err);
         error('Server', new Error(`${req.method} ${req.url.yellow} ${message.red}`));
     }
     await next();
