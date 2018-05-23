@@ -78,7 +78,12 @@ class Server {
         // Setup the store
         models_1.default(this);
         this.app.set('store', this.store);
-        this.app.use(helmet_1.default());
+        this.app.use(helmet_1.default({
+            frameguard: {
+                action: 'allow-from',
+                domain: '*'
+            }
+        }));
         await this._setupStatic();
         // Generate the position routers...
         await this._generatePositions();

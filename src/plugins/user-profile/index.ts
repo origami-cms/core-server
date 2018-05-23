@@ -16,6 +16,8 @@ export default (app: Server) => {
     r.get(async(req, res, next) => {
         if (res.headersSent) return next();
 
+        if (req.params.userId === 'default') return sendDefault(res);
+
         const m = res.app.get('store').model('user') as Origami.Store.Model;
         const u = await m.find({id: req.params.userId}) as Origami.Store.Resource;
 

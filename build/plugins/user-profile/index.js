@@ -16,6 +16,8 @@ exports.default = (app) => {
     r.get(async (req, res, next) => {
         if (res.headersSent)
             return next();
+        if (req.params.userId === 'default')
+            return sendDefault(res);
         const m = res.app.get('store').model('user');
         const u = await m.find({ id: req.params.userId });
         if (!u)

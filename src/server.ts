@@ -106,7 +106,13 @@ export default class Server {
         // Setup the store
         models(this);
         this.app.set('store', this.store);
-        this.app.use(helmet());
+        this.app.use(helmet({
+            frameguard: {
+                action: 'allow-from',
+                domain: '*'
+            }
+        }));
+
 
         await this._setupStatic();
         // Generate the position routers...
