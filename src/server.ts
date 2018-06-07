@@ -1,6 +1,8 @@
 import bodyParser from 'body-parser';
 import express, {Application, NextFunction, Request, Response, Router} from 'express';
 import helmet from 'helmet';
+// @ts-ignore
+import corser from 'corser';
 import {config, error, Origami, requireKeys, success, info} from 'origami-core-lib';
 import path from 'path';
 
@@ -112,6 +114,7 @@ export default class Server {
                 domain: '*'
             }
         }));
+        this.app.use(corser.create());
 
 
         await this._setupStatic();
@@ -160,7 +163,7 @@ export default class Server {
                 try {
                     const m = method.toLowerCase() as keyof Router;
                     (pr[m] as Function)(path, handlers);
-                    success('Server', `Conected ${p} route: `, method.toUpperCase().blue, p.blue);
+                    success('Server', `Connected ${p} route: `, method.toUpperCase().blue, p.blue);
                 } catch (e) {
                     error(
                         'Server',

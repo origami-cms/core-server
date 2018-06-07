@@ -18,7 +18,7 @@ export default class ThemeController {
     async setup() {
         // Load the initial theme
         if (this.initialTheme) theme.load(this.initialTheme);
-        await this.middlwareRoutes();
+        await this.middlewareRoutes();
 
         // Serve project content
         this.route.route('/content').use(express.static(
@@ -46,7 +46,7 @@ export default class ThemeController {
     }
 
     // Allow for theme to setup route controllers
-    async middlwareRoutes() {
+    async middlewareRoutes() {
         const routes = await theme.routes();
         routes.forEach(r => {
             const router = require(r);

@@ -13,6 +13,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_1 = __importDefault(require("express"));
 const helmet_1 = __importDefault(require("helmet"));
+// @ts-ignore
+const corser_1 = __importDefault(require("corser"));
 const origami_core_lib_1 = require("origami-core-lib");
 const path_1 = __importDefault(require("path"));
 const api_1 = __importDefault(require("./controllers/api"));
@@ -84,6 +86,7 @@ class Server {
                 domain: '*'
             }
         }));
+        this.app.use(corser_1.default.create());
         await this._setupStatic();
         // Generate the position routers...
         await this._generatePositions();
@@ -113,7 +116,7 @@ class Server {
                 try {
                     const m = method.toLowerCase();
                     pr[m](path, handlers);
-                    origami_core_lib_1.success('Server', `Conected ${p} route: `, method.toUpperCase().blue, p.blue);
+                    origami_core_lib_1.success('Server', `Connected ${p} route: `, method.toUpperCase().blue, p.blue);
                 }
                 catch (e) {
                     origami_core_lib_1.error('Server', new Error(`Could not connect ${method.toUpperCase().yellow} ${p.yellow}`));
