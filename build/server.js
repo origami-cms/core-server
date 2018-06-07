@@ -209,7 +209,8 @@ class Server {
         if (c && c.plugins) {
             Object.entries(c.plugins).forEach(([name, settings]) => {
                 if (Boolean(settings)) {
-                    const app = require(`origami-plugin-${name}`);
+                    const app = require(path_1.default.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
+                    // const app = require(pkg.main);
                     if (settings === true)
                         app(this);
                     else if (settings instanceof Object)
