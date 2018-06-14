@@ -1,4 +1,4 @@
-import {Origami} from 'origami-core-lib';
+import {Origami, log} from 'origami-core-lib';
 import path from 'path';
 import fs from 'fs';
 import recursive from 'recursive-readdir';
@@ -129,7 +129,9 @@ export class Route {
      * @param recursive If true, recursively nest routes
      */
     async include(p: string, prefix: string = '/', r: Boolean = true) {
+        log('Loading path', p);
         const nest = (_p: string) => {
+            log('Adding route', _p);
             const route = require(_p);
             if (route instanceof Route) return this.nested.push(route);
             return false;

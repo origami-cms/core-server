@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 }
 Object.defineProperty(exports, "__esModule", { value: true });
+const origami_core_lib_1 = require("origami-core-lib");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class Route {
@@ -91,7 +92,9 @@ class Route {
      * @param recursive If true, recursively nest routes
      */
     async include(p, prefix = '/', r = true) {
+        origami_core_lib_1.log('Loading path', p);
         const nest = (_p) => {
+            origami_core_lib_1.log('Adding route', _p);
             const route = require(_p);
             if (route instanceof Route)
                 return this.nested.push(route);
