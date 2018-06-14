@@ -11,8 +11,9 @@ module.exports = r;
 r.post(async(req, res, next) => {
     try {
         const model = await res.app.get('store').model('user');
+        console.log('getting user...');
 
-            // Find the user
+        // Find the user
         const [user] = await model.find({email: req.body.email}, {hidden: true});
         if (!user) return next(new Error('auth.errors.noUser'));
             // Compare password
@@ -20,12 +21,15 @@ r.post(async(req, res, next) => {
             return next(new Error('auth.errors.noUser'));
         }
 
-            // If successful, sign JWT
+        // If successful, sign JWT
         const token = auth.jwtSign({
             userId: user.id,
             email: user.email
         });
         const {iat: expires} = auth.jwtVerify(token);
+
+        console.log('got here');
+
 
         res.data = {token, expires};
         res.responseCode = 'auth.success.login';

@@ -22,7 +22,7 @@ exports.default = async () => {
     route
         .position('pre-render')
         .use((req, res, next) => {
-        if (!res.data && !res.body && !res.responseCode)
+        if (!res.data && !res.body && !res.responseCode && !res.text)
             res.responseCode = 'general.errors.notFound';
         next();
     });
