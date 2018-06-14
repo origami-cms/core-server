@@ -11,7 +11,6 @@ module.exports = r;
 r.post(async(req, res, next) => {
     try {
         const model = await res.app.get('store').model('user');
-        console.log('getting user...');
 
         // Find the user
         const [user] = await model.find({email: req.body.email}, {hidden: true});
@@ -27,8 +26,6 @@ r.post(async(req, res, next) => {
             email: user.email
         });
         const {iat: expires} = auth.jwtVerify(token);
-
-        console.log('got here');
 
 
         res.data = {token, expires};
