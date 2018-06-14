@@ -17,7 +17,7 @@ export default async() => {
             next();
         });
 
-    route.include(path.resolve(__dirname, './v1'), '/', true);
+    await route.include(path.resolve(__dirname, './v1'), '/', true);
 
 
     route

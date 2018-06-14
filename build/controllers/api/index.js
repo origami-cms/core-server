@@ -18,7 +18,7 @@ exports.default = async () => {
         }
         next();
     });
-    route.include(path_1.default.resolve(__dirname, './v1'), '/', true);
+    await route.include(path_1.default.resolve(__dirname, './v1'), '/', true);
     route
         .position('pre-render')
         .use((req, res, next) => {
