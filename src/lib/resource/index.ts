@@ -45,8 +45,6 @@ export default class Resource {
                         cMethod = options.controllers['list'] || cMethod;
                         break;
                     case 'post':
-                        console.log('custom crate');
-
                         cMethod = options.controllers['create'] || cMethod;
                 }
             }

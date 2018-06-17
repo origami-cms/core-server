@@ -211,11 +211,21 @@ class Server {
         if (c && c.plugins) {
             Object.entries(c.plugins).forEach(([name, settings]) => {
                 if (Boolean(settings)) {
-                    const app = require(path_1.default.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
+                    let plugin;
+                    // Attempt to load it from project first...
+                    try {
+                        plugin = require(path_1.default.resolve(process.cwd(), name));
+                    }
+                    catch (e) {
+                        // Otherwise attempt to load it from node_modules
+                        plugin = require(path_1.default.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
+                    }
+                    if (!plugin)
+                        return origami_core_lib_1.error(new Error(`Could not load plugin ${name}`));
                     if (settings === true)
-                        app(this);
+                        plugin(this);
                     else if (settings instanceof Object)
-                        app(this, settings);
+                        plugin(this, settings);
                 }
             });
         }
