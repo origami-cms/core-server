@@ -32,7 +32,7 @@ const DEFAULT_PORT = 8080;
 var Router_1 = require("./Router");
 exports.Route = Router_1.Route;
 class Server {
-    constructor(options, store, admin) {
+    constructor(options, store, admin, plugins) {
         this.app = express_1.default();
         this.store = store;
         this.admin = admin;
@@ -41,6 +41,7 @@ class Server {
             port: process.env.PORT || DEFAULT_PORT,
             ln: 'enUS'
         }, options);
+        this._plugins = plugins;
         // Special override for PORT in the environment variable
         if (process.env.PORT)
             this._options.port = parseInt(process.env.PORT, 10);
@@ -192,7 +193,7 @@ class Server {
         }
     }
     async _setupResources() {
-        const c = await origami_core_lib_1.config.read();
+        const c = this._options;
         if (!c)
             return;
         if (c.resources) {
@@ -211,14 +212,13 @@ class Server {
         }
     }
     async _setupPlugins() {
-        const c = await origami_core_lib_1.config.read();
-        if (c && c.plugins) {
-            Object.entries(c.plugins).forEach(([name, settings]) => {
+        if (this._plugins) {
+            Object.entries(this._plugins).forEach(([name, settings]) => {
                 if (Boolean(settings)) {
                     let plugin;
                     // Attempt to load it from project first...
                     try {
-                        plugin = require(path_1.default.resolve(process.cwd(), name));
+                        plugin = require(path_1.default.resolve(name));
                     }
                     catch (e) {
                         // Otherwise attempt to load it from node_modules

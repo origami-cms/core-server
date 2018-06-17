@@ -40,9 +40,15 @@ export default class Server {
     private _positions: Origami.Server.Position[];
     private _positionRouters: positionRouters;
     private _options: Origami.ConfigServer;
+    private _plugins?: Origami.Config['plugins'];
     private _server?: Http2Server;
 
-    constructor(options: Origami.ConfigServer, store: any, admin: Function) {
+    constructor(
+        options: Origami.ConfigServer,
+        store: any,
+        admin: Function,
+        plugins?: Origami.Config['plugins']
+    ) {
         this.app = express();
         this.store = store;
 
@@ -56,6 +62,7 @@ export default class Server {
                 ln: 'enUS'
             }, ...options
         };
+        this._plugins = plugins;
         // Special override for PORT in the environment variable
         if (process.env.PORT) this._options.port = parseInt(process.env.PORT, 10);
 
@@ -264,7 +271,7 @@ export default class Server {
 
 
     private async _setupResources() {
-        const c = await config.read();
+        const c = this._options;
 
         if (!c) return;
 
@@ -285,19 +292,18 @@ export default class Server {
     }
 
     private async _setupPlugins() {
-        const c = await config.read();
-
-        if (c && c.plugins) {
-            Object.entries(c.plugins).forEach(([name, settings]) => {
+        if (this._plugins) {
+            Object.entries(this._plugins).forEach(([name, settings]) => {
                 if (Boolean(settings)) {
                     let plugin;
                     // Attempt to load it from project first...
                     try {
-                        plugin = require(path.resolve(process.cwd(), name));
+                        plugin = require(path.resolve(name));
                     } catch (e) {
                         // Otherwise attempt to load it from node_modules
                         plugin = require(path.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
                     }
+
 
                     if (!plugin) return error(new Error(`Could not load plugin ${name}`));
 

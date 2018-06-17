@@ -11,8 +11,9 @@ export default class Server {
     private _positions;
     private _positionRouters;
     private _options;
+    private _plugins?;
     private _server?;
-    constructor(options: Origami.ConfigServer, store: any, admin: Function);
+    constructor(options: Origami.ConfigServer, store: any, admin: Function, plugins?: Origami.Config['plugins']);
     private _setup();
     serve(): void;
     stop(): void;
