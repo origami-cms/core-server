@@ -18,6 +18,7 @@ import Options from './Options';
 import {Route, RouterListItem} from './Router';
 import runScripts from './scripts';
 import upload from 'express-fileupload';
+import {Http2Server} from 'http2';
 
 const listEndPoints = require('express-list-endpoints');
 
@@ -39,6 +40,7 @@ export default class Server {
     private _positions: Origami.Server.Position[];
     private _positionRouters: positionRouters;
     private _options: Origami.ConfigServer;
+    private _server?: Http2Server;
 
     constructor(options: Origami.ConfigServer, store: any, admin: Function) {
         this.app = express();
@@ -144,10 +146,14 @@ export default class Server {
 
     // Runs the app
     serve() {
-        this.app.listen(this._options.port);
+        this._server = this.app.listen(this._options.port);
         success('Server', 'Listening on port', this._options.port.toString().cyan);
 
         runScripts(this);
+    }
+
+    stop() {
+        if (this._server) this._server.close();
     }
 
 

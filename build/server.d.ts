@@ -11,9 +11,11 @@ export default class Server {
     private _positions;
     private _positionRouters;
     private _options;
+    private _server?;
     constructor(options: Origami.ConfigServer, store: any, admin: Function);
     private _setup();
     serve(): void;
+    stop(): void;
     useRouter(router: Route): void;
     resource(name: string, options: ResourceOptions): void;
     static(path: string): void;

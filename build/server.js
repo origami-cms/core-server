@@ -105,9 +105,13 @@ class Server {
     }
     // Runs the app
     serve() {
-        this.app.listen(this._options.port);
+        this._server = this.app.listen(this._options.port);
         origami_core_lib_1.success('Server', 'Listening on port', this._options.port.toString().cyan);
         scripts_1.default(this);
+    }
+    stop() {
+        if (this._server)
+            this._server.close();
     }
     // Add the Router's routes in each position to the middleware
     useRouter(router) {
