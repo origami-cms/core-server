@@ -17,6 +17,7 @@ import models from './models';
 import Options from './Options';
 import {Route, RouterListItem} from './Router';
 import runScripts from './scripts';
+import upload from 'express-fileupload';
 
 const listEndPoints = require('express-list-endpoints');
 
@@ -108,6 +109,8 @@ export default class Server {
         // Setup the store
         models(this);
         this.app.set('store', this.store);
+
+        this.app.use(upload());
         this.app.use(helmet({
             frameguard: {
                 action: 'allow-from',

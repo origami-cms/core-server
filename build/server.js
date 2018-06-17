@@ -26,6 +26,7 @@ const format_1 = __importDefault(require("./middleware/format"));
 const models_1 = __importDefault(require("./models"));
 const Options_1 = __importDefault(require("./Options"));
 const scripts_1 = __importDefault(require("./scripts"));
+const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const listEndPoints = require('express-list-endpoints');
 const DEFAULT_PORT = 8080;
 var Router_1 = require("./Router");
@@ -80,6 +81,7 @@ class Server {
         // Setup the store
         models_1.default(this);
         this.app.set('store', this.store);
+        this.app.use(express_fileupload_1.default());
         this.app.use(helmet_1.default({
             frameguard: {
                 action: 'allow-from',
