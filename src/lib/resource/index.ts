@@ -5,11 +5,15 @@ const pluralize = require('pluralize');
 import auth from '../../middleware/auth';
 
 export type methods = 'get' | 'head' | 'post' | 'put' | 'delete' | 'list';
+export type controllers = 'list' | 'create' | 'get' | 'update' | 'delete';
 
 export interface ResourceOptions {
     model: Origami.Store.Schema;
     auth?: boolean | {
         [key in methods]: boolean
+    };
+    controllers?: {
+        [key in controllers]?: Origami.Server.RequestHandler
     };
 }
 
@@ -33,7 +37,19 @@ export default class Resource {
 
         (['get', 'post'] as methods[]).forEach(m => {
             const rMethod = this.router[m as keyof Route] as Function;
-            const cMethod = this[m as keyof Resource] as Function;
+            let cMethod = this[m as keyof Resource] as Function;
+
+            if (options.controllers) {
+                switch (m) {
+                    case 'get':
+                        cMethod = options.controllers['list'] || cMethod;
+                        break;
+                    case 'post':
+                        console.log('custom crate');
+
+                        cMethod = options.controllers['create'] || cMethod;
+                }
+            }
 
             rMethod.bind(this.router)(
                 this._auth.bind(this),
@@ -43,7 +59,19 @@ export default class Resource {
 
         (['get', 'delete', 'put'] as methods[]).forEach(m => {
             const rMethod = this.subRouter[m as keyof Route] as Function;
-            const cMethod = this[m as keyof Resource] as Function;
+            let cMethod = this[m as keyof Resource] as Function;
+
+            if (options.controllers) {
+                switch (m) {
+                    case 'get':
+                        cMethod = options.controllers['get'] || cMethod;
+                        break;
+                    case 'put':
+                        cMethod = options.controllers['update'] || cMethod;
+                    case 'delete':
+                        cMethod = options.controllers['delete'] || cMethod;
+                }
+            }
 
             rMethod.bind(this.subRouter)(
                 this._auth.bind(this),

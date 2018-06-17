@@ -19,12 +19,33 @@ class Resource {
             .position('store');
         ['get', 'post'].forEach(m => {
             const rMethod = this.router[m];
-            const cMethod = this[m];
+            let cMethod = this[m];
+            if (options.controllers) {
+                switch (m) {
+                    case 'get':
+                        cMethod = options.controllers['list'] || cMethod;
+                        break;
+                    case 'post':
+                        console.log('custom crate');
+                        cMethod = options.controllers['create'] || cMethod;
+                }
+            }
             rMethod.bind(this.router)(this._auth.bind(this), cMethod.bind(this));
         });
         ['get', 'delete', 'put'].forEach(m => {
             const rMethod = this.subRouter[m];
-            const cMethod = this[m];
+            let cMethod = this[m];
+            if (options.controllers) {
+                switch (m) {
+                    case 'get':
+                        cMethod = options.controllers['get'] || cMethod;
+                        break;
+                    case 'put':
+                        cMethod = options.controllers['update'] || cMethod;
+                    case 'delete':
+                        cMethod = options.controllers['delete'] || cMethod;
+                }
+            }
             rMethod.bind(this.subRouter)(this._auth.bind(this), cMethod.bind(this));
         });
         this.store.model(resource, options.model);

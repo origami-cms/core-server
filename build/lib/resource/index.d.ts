@@ -1,10 +1,14 @@
 import { Origami } from 'origami-core-lib';
 import { Route } from '../../Router';
 export declare type methods = 'get' | 'head' | 'post' | 'put' | 'delete' | 'list';
+export declare type controllers = 'list' | 'create' | 'get' | 'update' | 'delete';
 export interface ResourceOptions {
     model: Origami.Store.Schema;
     auth?: boolean | {
         [key in methods]: boolean;
+    };
+    controllers?: {
+        [key in controllers]?: Origami.Server.RequestHandler;
     };
 }
 export default class Resource {
