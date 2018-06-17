@@ -284,10 +284,19 @@ export default class Server {
         if (c && c.plugins) {
             Object.entries(c.plugins).forEach(([name, settings]) => {
                 if (Boolean(settings)) {
-                    const app = require(path.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
+                    let plugin;
+                    // Attempt to load it from project first...
+                    try {
+                        plugin = require(path.resolve(process.cwd(), name));
+                    } catch (e) {
+                        // Otherwise attempt to load it from node_modules
+                        plugin = require(path.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
+                    }
 
-                    if (settings === true) app(this);
-                    else if (settings instanceof Object) app(this, settings);
+                    if (!plugin) return error(new Error(`Could not load plugin ${name}`));
+
+                    if (settings === true) plugin(this);
+                    else if (settings instanceof Object) plugin(this, settings);
                 }
             });
         }
