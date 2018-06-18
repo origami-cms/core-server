@@ -14,16 +14,17 @@ export default class Server {
     private _plugins?;
     private _server?;
     constructor(options: Origami.ConfigServer, store: any, admin: Function, plugins?: Origami.Config['plugins']);
-    private _setup();
     serve(): void;
     stop(): void;
     useRouter(router: Route): void;
+    plugin(name: string, settings: Origami.Config['plugins']): Promise<void>;
     resource(name: string, options: ResourceOptions): void;
     static(path: string): void;
-    private _generatePositions();
+    private _setup();
+    private _setupPositions();
     private _setupMiddleware();
     private _setupStatic();
     private _setupResources();
-    private _setupPlugins();
+    private _defaultPlugins();
     private _position(pos);
 }

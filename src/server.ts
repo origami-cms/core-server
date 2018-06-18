@@ -43,15 +43,15 @@ export default class Server {
     private _plugins?: Origami.Config['plugins'];
     private _server?: Http2Server;
 
+
     constructor(
         options: Origami.ConfigServer,
         store: any,
-        admin: Function,
-        plugins?: Origami.Config['plugins']
+        admin: Function
     ) {
+
         this.app = express();
         this.store = store;
-
         this.admin = admin;
 
 
@@ -62,12 +62,10 @@ export default class Server {
                 ln: 'enUS'
             }, ...options
         };
-        this._plugins = {
-            ...defaultPlugins,
-            ...plugins
-        };
+
         // Special override for PORT in the environment variable
         if (process.env.PORT) this._options.port = parseInt(process.env.PORT, 10);
+
 
         Options.options = this._options;
 
@@ -116,51 +114,15 @@ export default class Server {
     }
 
 
-    // Registers all the middleware and serves the app
-    private async _setup() {
-        // Setup the store
-        models(this);
-        this.app.set('store', this.store);
-
-        this.app.use(upload());
-        this.app.use(helmet({
-            frameguard: {
-                action: 'allow-from',
-                domain: '*'
-            }
-        }));
-        this.app.use(corser.create());
-
-
-        await this._setupStatic();
-        // Generate the position routers...
-        await this._generatePositions();
-        // Const content = await require('origami-core-server-content')();
-        // this.useRouter(
-        //     content
-        // );
-
-        // Setup the middleware
-        await this._setupMiddleware();
-
-
-        await this._setupResources();
-        await this._setupPlugins();
-
-
-        // Serve the app
-        this.serve();
-
-    }
-
-
     // Runs the app
     serve() {
         this._server = this.app.listen(this._options.port);
         success('Server', 'Listening on port', this._options.port.toString().cyan);
 
+        // Run the default scripts
         runScripts(this);
     }
+
 
     stop() {
         if (this._server) this._server.close();
@@ -195,17 +157,75 @@ export default class Server {
     }
 
 
+    async plugin(name: string, settings: Origami.Config['plugins']) {
+        if (Boolean(settings)) {
+            let plugin;
+
+            try {
+                // Attempt to load the plugin as a default plugin
+                plugin = require(`origami-plugin-${name}`);
+            } catch (e) {
+                // Then attempt to load it from project as a custom file...
+                try {
+                    plugin = require(path.resolve(name));
+                } catch (e) {
+                    // Otherwise attempt to load it from the project's node_modules
+                    plugin = require(path.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
+                }
+            }
+
+
+            if (!plugin) return error(new Error(`Could not load plugin ${name}`));
+            if (typeof plugin !== 'function') return error(new Error(`Plugin ${name} does not export a function`));
+
+            await plugin(this, settings);
+        }
+    }
+
+
     resource(name: string, options: ResourceOptions) {
         const c = new Resource(name, this.store, options);
         this.useRouter(c.router);
+        return c;
     }
+
 
     // Wrapper for express.static
     static(path: string) {
         this.app.use(express.static(path));
     }
 
-    private async _generatePositions() {
+
+    // Registers all the middleware and serves the app
+    private async _setup() {
+        // Setup the store
+        models(this);
+        this.app.set('store', this.store);
+
+        this.app.use(upload());
+        this.app.use(helmet({
+            frameguard: {
+                action: 'allow-from',
+                domain: '*'
+            }
+        }));
+        this.app.use(corser.create());
+
+
+        await this._setupStatic();
+
+        // Generate the position routers...
+        await this._setupPositions();
+
+        // Setup the middleware
+        await this._setupMiddleware();
+
+        // Setup the default plugins
+        await this._setupDefaultPlugins();
+    }
+
+
+    private async _setupPositions() {
         // Setup API
         this.useRouter(
             await api()
@@ -224,6 +244,7 @@ export default class Server {
         // Setup Theme
         if (initialTheme) this.useRouter(await theme(initialTheme));
     }
+
 
     private async _setupMiddleware() {
 
@@ -261,6 +282,7 @@ export default class Server {
         this.app.use(await mwFormat());
     }
 
+
     private async _setupStatic() {
         const s = this._options.static;
         if (s) {
@@ -273,57 +295,12 @@ export default class Server {
     }
 
 
-    private async _setupResources() {
-        const c = this._options;
-
-        if (!c) return;
-
-        if (c.resources) {
-            Object.entries(c.resources).forEach(([name, r]) => {
-                if (typeof r === 'string') {
-                    const model = require(path.resolve(process.cwd(), r));
-                    const auth = true;
-                    this.resource(name, {model, auth});
-
-                } else if (r instanceof Object) {
-                    const model = require(path.resolve(process.cwd(), r.model));
-                    const auth = r.auth;
-                    this.resource(name, {model, auth});
-                }
-            });
-        }
+    private async _setupDefaultPlugins() {
+        Object.entries(defaultPlugins).forEach(([name, settings]) => {
+            this.plugin(name, settings);
+        });
     }
 
-
-    private async _setupPlugins() {
-        if (this._plugins) {
-            Object.entries(this._plugins).forEach(([name, settings]) => {
-                if (Boolean(settings)) {
-                    let plugin;
-
-                    try {
-                        // Attempt to load the plugin as a default plugin
-                        plugin = require(`origami-plugin-${name}`);
-                    } catch (e) {
-                        // Then attempt to load it from project as a custom file...
-                        try {
-                            plugin = require(path.resolve(name));
-                        } catch (e) {
-                            // Otherwise attempt to load it from the project's node_modules
-                            plugin = require(path.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
-                        }
-                    }
-
-
-                    if (!plugin) return error(new Error(`Could not load plugin ${name}`));
-                    if (typeof plugin !== 'function') return error(new Error(`Plugin ${name} does not export a function`));
-
-                    if (settings === true) plugin(this);
-                    else if (settings instanceof Object) plugin(this, settings);
-                }
-            });
-        }
-    }
 
     // Run the middleware for the router position
     private _position(pos: Origami.Server.Position) {
