@@ -128,7 +128,6 @@ class Server {
     }
     // Wrapper for express.static
     static(path, prefix) {
-        console.log('setting static', path, prefix);
         if (!prefix)
             this.app.use(express_1.default.static(path));
         else
