@@ -1,6 +1,6 @@
 {
   "name": "origami-core-server",
-  "version": "0.4.1-alpha.2",
+  "version": "0.4.1",
   "description": "Core server for Origami CMS",
   "main": "build/server.js",
   "author": "Tristan Matthias <hello@tristanmathias.com>",
