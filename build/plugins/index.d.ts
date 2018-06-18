@@ -1,1 +1,4 @@
-export { default as userProfile } from './user-profile/index';
+declare const _default: {
+    'user-profiles': boolean;
+};
+export default _default;

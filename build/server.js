@@ -2,13 +2,6 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 }
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-}
 Object.defineProperty(exports, "__esModule", { value: true });
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_1 = __importDefault(require("express"));
@@ -19,7 +12,7 @@ const origami_core_lib_1 = require("origami-core-lib");
 const path_1 = __importDefault(require("path"));
 const api_1 = __importDefault(require("./controllers/api"));
 const theme_1 = __importDefault(require("./controllers/theme"));
-const plugins = __importStar(require("./plugins"));
+const plugins_1 = __importDefault(require("./plugins"));
 const lib_1 = require("./lib");
 const errors_1 = __importDefault(require("./middleware/errors"));
 const format_1 = __importDefault(require("./middleware/format"));
@@ -41,7 +34,7 @@ class Server {
             port: process.env.PORT || DEFAULT_PORT,
             ln: 'enUS'
         }, options);
-        this._plugins = plugins;
+        this._plugins = Object.assign({}, plugins_1.default, plugins);
         // Special override for PORT in the environment variable
         if (process.env.PORT)
             this._options.port = parseInt(process.env.PORT, 10);
@@ -216,16 +209,30 @@ class Server {
             Object.entries(this._plugins).forEach(([name, settings]) => {
                 if (Boolean(settings)) {
                     let plugin;
-                    // Attempt to load it from project first...
                     try {
-                        plugin = require(path_1.default.resolve(name));
+                        // Attempt to load the plugin as a default plugin
+                        console.log('first');
+                        plugin = require(name);
+                        console.log('after first');
                     }
                     catch (e) {
-                        // Otherwise attempt to load it from node_modules
-                        plugin = require(path_1.default.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
+                        console.log('err first');
+                        // Then attempt to load it from project as a custom file...
+                        try {
+                            console.log('second');
+                            plugin = require(path_1.default.resolve(name));
+                            console.log('after second');
+                        }
+                        catch (e) {
+                            console.log('err second', e);
+                            // Otherwise attempt to load it from the project's node_modules
+                            plugin = require(path_1.default.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
+                        }
                     }
                     if (!plugin)
                         return origami_core_lib_1.error(new Error(`Could not load plugin ${name}`));
+                    if (typeof plugin !== 'function')
+                        return origami_core_lib_1.error(new Error(`Plugin ${name} does not export a function`));
                     if (settings === true)
                         plugin(this);
                     else if (settings instanceof Object)
@@ -233,9 +240,6 @@ class Server {
                 }
             });
         }
-        Object.entries(plugins).forEach(([name, plugin]) => {
-            plugin(this);
-        });
     }
     // Run the middleware for the router position
     _position(pos) {

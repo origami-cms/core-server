@@ -1,1 +1,4 @@
-export {default as userProfile} from './user-profile/index';
+// Default plugins
+export default {
+    'user-profiles': true
+};
