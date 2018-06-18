@@ -303,13 +303,22 @@ export default class Server {
 
                     try {
                         // Attempt to load the plugin as a default plugin
+                        console.log('first');
+
                         plugin = require(name);
+                        console.log('after first');
                     } catch (e) {
+                        console.log('err first');
+
                         // Then attempt to load it from project as a custom file...
                         try {
+                            console.log('second', path.resolve(name));
                             plugin = require(path.resolve(name));
+                            console.log('after second');
 
                         } catch (e) {
+                            console.log('err second', e);
+
                             // Otherwise attempt to load it from the project's node_modules
                             plugin = require(path.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
                         }
