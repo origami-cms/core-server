@@ -25,16 +25,14 @@ const DEFAULT_PORT = 8080;
 var Router_1 = require("./Router");
 exports.Route = Router_1.Route;
 class Server {
-    constructor(options, store, admin, plugins) {
+    constructor(options, store) {
         this.app = express_1.default();
         this.store = store;
-        this.admin = admin;
         // Assign these to a singleton class so they can be use across the server
         this._options = Object.assign({
             port: process.env.PORT || DEFAULT_PORT,
             ln: 'enUS'
         }, options);
-        this._plugins = Object.assign({}, plugins_1.default, plugins);
         // Special override for PORT in the environment variable
         if (process.env.PORT)
             this._options.port = parseInt(process.env.PORT, 10);
@@ -126,10 +124,15 @@ class Server {
     resource(name, options) {
         const c = new lib_1.Resource(name, this.store, options);
         this.useRouter(c.router);
+        return c;
     }
     // Wrapper for express.static
-    static(path) {
-        this.app.use(express_1.default.static(path));
+    static(path, prefix) {
+        console.log('setting static', path, prefix);
+        if (!prefix)
+            this.app.use(express_1.default.static(path));
+        else
+            this.app.use(prefix, express_1.default.static(path));
     }
     // Registers all the middleware and serves the app
     async _setup() {
@@ -149,10 +152,8 @@ class Server {
         await this._setupPositions();
         // Setup the middleware
         await this._setupMiddleware();
-        // Setup the resources
-        await this._setupResources();
-        // Setup the resources
-        await this._defaultPlugins();
+        // Setup the default plugins
+        await this._setupDefaultPlugins();
     }
     async _setupPositions() {
         // Setup API
@@ -179,8 +180,6 @@ class Server {
             extended: true
         }));
         this.app.use(body_parser_1.default.json());
-        // Setup admin
-        this.app.use('/admin/', this.admin());
         // PRE-STORE position
         this._position('pre-store');
         this._position('store');
@@ -206,26 +205,7 @@ class Server {
             }
         }
     }
-    async _setupResources() {
-        const c = this._options;
-        if (!c)
-            return;
-        if (c.resources) {
-            Object.entries(c.resources).forEach(([name, r]) => {
-                if (typeof r === 'string') {
-                    const model = require(path_1.default.resolve(process.cwd(), r));
-                    const auth = true;
-                    this.resource(name, { model, auth });
-                }
-                else if (r instanceof Object) {
-                    const model = require(path_1.default.resolve(process.cwd(), r.model));
-                    const auth = r.auth;
-                    this.resource(name, { model, auth });
-                }
-            });
-        }
-    }
-    async _defaultPlugins() {
+    async _setupDefaultPlugins() {
         Object.entries(plugins_1.default).forEach(([name, settings]) => {
             this.plugin(name, settings);
         });

@@ -35,7 +35,6 @@ export {Route} from './Router';
 export default class Server {
     app: Application;
     store: any;
-    admin: Function;
 
     private _positions: Origami.Server.Position[];
     private _positionRouters: positionRouters;
@@ -46,13 +45,11 @@ export default class Server {
 
     constructor(
         options: Origami.ConfigServer,
-        store: any,
-        admin: Function
+        store: any
     ) {
 
         this.app = express();
         this.store = store;
-        this.admin = admin;
 
 
         // Assign these to a singleton class so they can be use across the server
@@ -191,8 +188,11 @@ export default class Server {
 
 
     // Wrapper for express.static
-    static(path: string) {
-        this.app.use(express.static(path));
+    static(path: string, prefix?: string) {
+        console.log('setting static', path, prefix);
+
+        if (!prefix) this.app.use(express.static(path));
+        else this.app.use(prefix, express.static(path));
     }
 
 
@@ -255,10 +255,6 @@ export default class Server {
             extended: true
         }));
         this.app.use(bodyParser.json());
-
-
-        // Setup admin
-        this.app.use('/admin/', this.admin());
 
 
         // PRE-STORE position
