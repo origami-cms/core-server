@@ -1,7 +1,6 @@
-import {Origami, log} from 'origami-core-lib';
-import path from 'path';
 import fs from 'fs';
-import recursive from 'recursive-readdir';
+import {Origami, error} from 'origami-core-lib';
+import path from 'path';
 
 export type Routers = {
     [K in Origami.Server.Position]: RouterListItem[]
@@ -131,7 +130,8 @@ export class Route {
     async include(p: string, prefix: string = '/', r: Boolean = true) {
         const nest = (_p: string) => {
             const route = require(_p);
-            if (route instanceof Route) return this.nested.push(route);
+            if (route.constructor.name) return this.nested.push(route);
+            error(`File ${_p} does not export a Route`);
             return false;
         };
 

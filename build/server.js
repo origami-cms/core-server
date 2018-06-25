@@ -4,22 +4,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 const body_parser_1 = __importDefault(require("body-parser"));
-const express_1 = __importDefault(require("express"));
-const helmet_1 = __importDefault(require("helmet"));
 // @ts-ignore
 const corser_1 = __importDefault(require("corser"));
+const express_1 = __importDefault(require("express"));
+const express_fileupload_1 = __importDefault(require("express-fileupload"));
+const helmet_1 = __importDefault(require("helmet"));
 const origami_core_lib_1 = require("origami-core-lib");
 const path_1 = __importDefault(require("path"));
 const api_1 = __importDefault(require("./controllers/api"));
 const theme_1 = __importDefault(require("./controllers/theme"));
-const plugins_1 = __importDefault(require("./plugins"));
 const lib_1 = require("./lib");
 const errors_1 = __importDefault(require("./middleware/errors"));
 const format_1 = __importDefault(require("./middleware/format"));
 const models_1 = __importDefault(require("./models"));
 const Options_1 = __importDefault(require("./Options"));
+const plugins_1 = __importDefault(require("./plugins"));
 const scripts_1 = __importDefault(require("./scripts"));
-const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const listEndPoints = require('express-list-endpoints');
 const DEFAULT_PORT = 8080;
 var Router_1 = require("./Router");
@@ -100,24 +100,12 @@ class Server {
     async plugin(name, settings) {
         if (Boolean(settings)) {
             let plugin;
-            try {
-                // Attempt to load the plugin as a default plugin
-                plugin = require(`origami-plugin-${name}`);
-            }
-            catch (e) {
-                // Then attempt to load it from project as a custom file...
-                try {
-                    plugin = require(path_1.default.resolve(name));
-                }
-                catch (e) {
-                    // Otherwise attempt to load it from the project's node_modules
-                    plugin = require(path_1.default.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
-                }
-            }
+            plugin = await origami_core_lib_1.requireLib(name, __dirname, 'origami-plugin-');
             if (!plugin)
                 return origami_core_lib_1.error(new Error(`Could not load plugin ${name}`));
-            if (typeof plugin !== 'function')
+            if (typeof plugin !== 'function') {
                 return origami_core_lib_1.error(new Error(`Plugin ${name} does not export a function`));
+            }
             await plugin(this, settings);
         }
     }

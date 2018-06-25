@@ -27,7 +27,7 @@
     "marked": "^0.3.6",
     "md5": "^2.2.1",
     "npm-programmatic": "^0.0.10",
-    "origami-core-lib": "^0.3.5",
+    "origami-core-lib": "^0.3.7",
     "origami-core-server": "^0.3.7",
     "origami-core-server-statuses": "^0.0.8",
     "origami-plugin-media": "^1.0.1",

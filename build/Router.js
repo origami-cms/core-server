@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const origami_core_lib_1 = require("origami-core-lib");
+const path_1 = __importDefault(require("path"));
 class Route {
     constructor(url = null, parent) {
         this._curposition = 'init';
@@ -93,8 +94,9 @@ class Route {
     async include(p, prefix = '/', r = true) {
         const nest = (_p) => {
             const route = require(_p);
-            if (route instanceof Route)
+            if (route.constructor.name)
                 return this.nested.push(route);
+            origami_core_lib_1.error(`File ${_p} does not export a Route`);
             return false;
         };
         const stat = await fs_1.default.statSync(p);

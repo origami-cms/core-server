@@ -1,24 +1,24 @@
 import bodyParser from 'body-parser';
-import express, {Application, NextFunction, Request, Response, Router} from 'express';
-import helmet from 'helmet';
 // @ts-ignore
 import corser from 'corser';
-import {config, error, Origami, requireKeys, success, info} from 'origami-core-lib';
+import express, {Application, Router} from 'express';
+import upload from 'express-fileupload';
+import helmet from 'helmet';
+import {Http2Server} from 'http2';
+import {config, error, Origami, requireKeys, success, requireLib} from 'origami-core-lib';
 import path from 'path';
-
 import api from './controllers/api';
 import theme from './controllers/theme';
-import defaultPlugins from './plugins';
 import {Resource} from './lib';
 import {ResourceOptions} from './lib/resource';
 import mwErrors from './middleware/errors';
 import mwFormat from './middleware/format';
 import models from './models';
 import Options from './Options';
+import defaultPlugins from './plugins';
 import {Route, RouterListItem} from './Router';
 import runScripts from './scripts';
-import upload from 'express-fileupload';
-import {Http2Server} from 'http2';
+
 
 const listEndPoints = require('express-list-endpoints');
 
@@ -154,26 +154,17 @@ export default class Server {
     }
 
 
-    async plugin(name: string, settings: Origami.Config['plugins']) {
+    async plugin(name: string, settings: boolean | object) {
         if (Boolean(settings)) {
             let plugin;
 
-            try {
-                // Attempt to load the plugin as a default plugin
-                plugin = require(`origami-plugin-${name}`);
-            } catch (e) {
-                // Then attempt to load it from project as a custom file...
-                try {
-                    plugin = require(path.resolve(name));
-                } catch (e) {
-                    // Otherwise attempt to load it from the project's node_modules
-                    plugin = require(path.resolve(process.cwd(), `node_modules/origami-plugin-${name}`));
-                }
-            }
+            plugin = await requireLib(name, __dirname, 'origami-plugin-');
 
 
             if (!plugin) return error(new Error(`Could not load plugin ${name}`));
-            if (typeof plugin !== 'function') return error(new Error(`Plugin ${name} does not export a function`));
+            if (typeof plugin !== 'function') {
+                return error(new Error(`Plugin ${name} does not export a function`));
+            }
 
             await plugin(this, settings);
         }

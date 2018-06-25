@@ -17,7 +17,7 @@ export default class Server {
     serve(): void;
     stop(): void;
     useRouter(router: Route): void;
-    plugin(name: string, settings: Origami.Config['plugins']): Promise<void>;
+    plugin(name: string, settings: boolean | object): Promise<void>;
     resource(name: string, options: ResourceOptions): Resource;
     static(path: string, prefix?: string): void;
     private _setup();
