@@ -94,7 +94,7 @@ class Route {
     async include(p, prefix = '/', r = true) {
         const nest = (_p) => {
             const route = require(_p);
-            if (route.constructor.name)
+            if (route.constructor.name === 'Route')
                 return this.nested.push(route);
             origami_core_lib_1.error(`File ${_p} does not export a Route`);
             return false;

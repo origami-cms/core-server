@@ -1,10 +1,11 @@
 /// <reference types="express" />
 import { Application } from 'express';
 import { Origami } from 'origami-core-lib';
-import { Resource } from './lib';
-import { ResourceOptions } from './lib/resource';
+import Resource, { ResourceOptions } from './lib/resource';
 import { Route } from './Router';
 export { Route } from './Router';
+export { lib } from './lib';
+export { default as Auth } from './middleware/auth';
 export default class Server {
     app: Application;
     store: any;

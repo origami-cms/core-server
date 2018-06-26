@@ -11,12 +11,9 @@ const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const helmet_1 = __importDefault(require("helmet"));
 const origami_core_lib_1 = require("origami-core-lib");
 const path_1 = __importDefault(require("path"));
-const api_1 = __importDefault(require("./controllers/api"));
-const theme_1 = __importDefault(require("./controllers/theme"));
-const lib_1 = require("./lib");
+const resource_1 = __importDefault(require("./lib/resource"));
 const errors_1 = __importDefault(require("./middleware/errors"));
 const format_1 = __importDefault(require("./middleware/format"));
-const models_1 = __importDefault(require("./models"));
 const Options_1 = __importDefault(require("./Options"));
 const plugins_1 = __importDefault(require("./plugins"));
 const scripts_1 = __importDefault(require("./scripts"));
@@ -24,6 +21,10 @@ const listEndPoints = require('express-list-endpoints');
 const DEFAULT_PORT = 8080;
 var Router_1 = require("./Router");
 exports.Route = Router_1.Route;
+var lib_1 = require("./lib");
+exports.lib = lib_1.lib;
+var auth_1 = require("./middleware/auth");
+exports.Auth = auth_1.default;
 class Server {
     constructor(options, store) {
         this.app = express_1.default();
@@ -67,6 +68,7 @@ class Server {
         }
         this._setup();
         this.app.set('ln', this._options.ln);
+        this.app.set('secret', this._options.secret);
     }
     // Runs the app
     serve() {
@@ -110,7 +112,7 @@ class Server {
         }
     }
     resource(name, options) {
-        const c = new lib_1.Resource(name, this.store, options);
+        const c = new resource_1.default(name, this.store, options);
         this.useRouter(c.router);
         return c;
     }
@@ -124,8 +126,9 @@ class Server {
     // Registers all the middleware and serves the app
     async _setup() {
         // Setup the store
-        models_1.default(this);
         this.app.set('store', this.store);
+        // Setup the default plugins
+        await this._setupDefaultPlugins();
         this.app.use(express_fileupload_1.default());
         this.app.use(helmet_1.default({
             frameguard: {
@@ -139,27 +142,19 @@ class Server {
         await this._setupPositions();
         // Setup the middleware
         await this._setupMiddleware();
-        // Setup the default plugins
-        await this._setupDefaultPlugins();
     }
     async _setupPositions() {
-        // Setup API
-        this.useRouter(await api_1.default());
-        // Load initial theme
-        let initialTheme = null;
-        const [setting] = await this.store.model('setting').find({ setting: 'theme' });
-        if (setting)
-            initialTheme = setting.value;
-        const c = await origami_core_lib_1.config.read();
-        if (c && c.theme) {
-            if (c.theme.name)
-                initialTheme = c.theme.name;
-            else if (c.theme.path)
-                initialTheme = c.theme.path;
-        }
-        // Setup Theme
-        if (initialTheme)
-            this.useRouter(await theme_1.default(initialTheme));
+        // // Load initial theme
+        // let initialTheme = null;
+        // const [setting] = await this.store.model('setting').find({setting: 'theme'});
+        // if (setting) initialTheme = setting.value;
+        // const c = await config.read();
+        // if (c && c.theme) {
+        //     if (c.theme.name) initialTheme = c.theme.name;
+        //     else if (c.theme.path) initialTheme = c.theme.path;
+        // }
+        // // Setup Theme
+        // if (initialTheme) this.useRouter(await theme(initialTheme));
     }
     async _setupMiddleware() {
         this._position('init');
@@ -193,8 +188,8 @@ class Server {
         }
     }
     async _setupDefaultPlugins() {
-        Object.entries(plugins_1.default).forEach(([name, settings]) => {
-            this.plugin(name, settings);
+        Object.entries(plugins_1.default).forEach(async ([name, settings]) => {
+            await this.plugin(name, settings);
         });
     }
     // Run the middleware for the router position

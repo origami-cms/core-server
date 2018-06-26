@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 exports.default = async (app) => {
     const store = await app.app.get('store');
-    const model = store.model('origamiconfig');
+    const model = store.model('setting');
     const existing = await model.find({ setting: 'setup' });
     if (!existing.length) {
         const con = await model.create({

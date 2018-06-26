@@ -6,8 +6,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 }
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+}
 Object.defineProperty(exports, "__esModule", { value: true });
+// tslint:disable variable-name
 const _npm = __importStar(require("./npm"));
-var resource_1 = require("./resource");
-exports.Resource = resource_1.default;
-exports.NPM = _npm;
+const resource_1 = __importDefault(require("./resource"));
+var lib;
+(function (lib) {
+    lib.Resource = resource_1.default;
+    lib.NPM = _npm;
+})(lib = exports.lib || (exports.lib = {}));

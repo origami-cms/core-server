@@ -7,13 +7,10 @@ import helmet from 'helmet';
 import {Http2Server} from 'http2';
 import {config, error, Origami, requireKeys, success, requireLib} from 'origami-core-lib';
 import path from 'path';
-import api from './controllers/api';
 import theme from './controllers/theme';
-import {Resource} from './lib';
-import {ResourceOptions} from './lib/resource';
+import Resource, {ResourceOptions} from './lib/resource';
 import mwErrors from './middleware/errors';
 import mwFormat from './middleware/format';
-import models from './models';
 import Options from './Options';
 import defaultPlugins from './plugins';
 import {Route, RouterListItem} from './Router';
@@ -31,6 +28,8 @@ const DEFAULT_PORT = 8080;
 
 
 export {Route} from './Router';
+export {lib} from './lib';
+export {default as Auth} from './middleware/auth';
 
 export default class Server {
     app: Application;
@@ -108,6 +107,7 @@ export default class Server {
 
 
         this.app.set('ln', this._options.ln);
+        this.app.set('secret', this._options.secret);
     }
 
 
@@ -136,6 +136,8 @@ export default class Server {
                 handlers: Function[];
                 method: Origami.Server.Method;
             }
+
+
             router.routers[p].forEach(({path, handlers, method}: RouterListItem) => {
                 const p = (path || '').toString();
                 try {
@@ -188,8 +190,12 @@ export default class Server {
     // Registers all the middleware and serves the app
     private async _setup() {
         // Setup the store
-        models(this);
         this.app.set('store', this.store);
+
+
+        // Setup the default plugins
+        await this._setupDefaultPlugins();
+
 
         this.app.use(upload());
         this.app.use(helmet({
@@ -208,30 +214,22 @@ export default class Server {
 
         // Setup the middleware
         await this._setupMiddleware();
-
-        // Setup the default plugins
-        await this._setupDefaultPlugins();
     }
 
 
     private async _setupPositions() {
-        // Setup API
-        this.useRouter(
-            await api()
-        );
+        // // Load initial theme
+        // let initialTheme = null;
+        // const [setting] = await this.store.model('setting').find({setting: 'theme'});
+        // if (setting) initialTheme = setting.value;
+        // const c = await config.read();
+        // if (c && c.theme) {
+        //     if (c.theme.name) initialTheme = c.theme.name;
+        //     else if (c.theme.path) initialTheme = c.theme.path;
+        // }
 
-        // Load initial theme
-        let initialTheme = null;
-        const [setting] = await this.store.model('setting').find({setting: 'theme'});
-        if (setting) initialTheme = setting.value;
-        const c = await config.read();
-        if (c && c.theme) {
-            if (c.theme.name) initialTheme = c.theme.name;
-            else if (c.theme.path) initialTheme = c.theme.path;
-        }
-
-        // Setup Theme
-        if (initialTheme) this.useRouter(await theme(initialTheme));
+        // // Setup Theme
+        // if (initialTheme) this.useRouter(await theme(initialTheme));
     }
 
 
@@ -281,8 +279,8 @@ export default class Server {
 
 
     private async _setupDefaultPlugins() {
-        Object.entries(defaultPlugins).forEach(([name, settings]) => {
-            this.plugin(name, settings);
+        Object.entries(defaultPlugins).forEach(async ([name, settings]) => {
+            await this.plugin(name, settings);
         });
     }
 

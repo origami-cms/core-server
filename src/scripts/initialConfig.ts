@@ -7,7 +7,7 @@ import * as auth from '../lib/auth';
  */
 export default async(app: Server) => {
     const store = await app.app.get('store') as Origami.Store.Store;
-    const model = store.model('origamiconfig') as Origami.Store.Model;
+    const model = store.model('setting') as Origami.Store.Model;
 
     const existing = await model.find({setting: 'setup'}) as Origami.Store.Resource[];
 

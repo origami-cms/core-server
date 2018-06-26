@@ -9,7 +9,8 @@
   "scripts": {
     "lint": "tslint -p . --fix",
     "watch": "tsc --watch",
-    "build": "tsc"
+    "clean": "rm -rf build/",
+    "build": "yarn clean; tsc"
   },
   "dependencies": {
     "bcrypt": "^2.0.1",
@@ -30,6 +31,7 @@
     "origami-core-lib": "^0.3.7",
     "origami-core-server": "^0.3.7",
     "origami-core-server-statuses": "^0.0.8",
+    "origami-plugin-core-api": "^0.0.2",
     "origami-plugin-media": "^1.0.1",
     "origami-plugin-user-profiles": "^1.0.0",
     "osprey": "^0.5.0",

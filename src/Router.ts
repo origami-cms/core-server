@@ -130,7 +130,7 @@ export class Route {
     async include(p: string, prefix: string = '/', r: Boolean = true) {
         const nest = (_p: string) => {
             const route = require(_p);
-            if (route.constructor.name) return this.nested.push(route);
+            if (route.constructor.name === 'Route') return this.nested.push(route);
             error(`File ${_p} does not export a Route`);
             return false;
         };

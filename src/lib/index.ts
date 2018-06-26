@@ -1,3 +1,9 @@
+// tslint:disable variable-name
 import * as _npm from './npm';
-export {default as Resource} from './resource';
-export const NPM = _npm;
+import _Resource from './resource';
+
+
+export namespace lib {
+    export const Resource = _Resource;
+    export const NPM = _npm;
+}
