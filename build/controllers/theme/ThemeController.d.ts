@@ -1,5 +1,5 @@
-import { Route } from '../../Router';
-import { Origami } from 'origami-core-lib';
+import { Origami, Route } from 'origami-core-lib';
+export { Route } from 'origami-core-lib';
 export default class ThemeController {
     route: Route;
     initialTheme: string;

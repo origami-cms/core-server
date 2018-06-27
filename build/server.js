@@ -19,12 +19,8 @@ const plugins_1 = __importDefault(require("./plugins"));
 const scripts_1 = __importDefault(require("./scripts"));
 const listEndPoints = require('express-list-endpoints');
 const DEFAULT_PORT = 8080;
-var Router_1 = require("./Router");
-exports.Route = Router_1.Route;
 var lib_1 = require("./lib");
 exports.lib = lib_1.lib;
-var auth_1 = require("./middleware/auth");
-exports.Auth = auth_1.default;
 class Server {
     constructor(options, store) {
         this.app = express_1.default();

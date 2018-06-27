@@ -1,6 +1,5 @@
+import {Origami} from 'origami-core-lib';
 import Server from '../server';
-import {Origami, config, error} from 'origami-core-lib';
-import * as auth from '../lib/auth';
 
 /**
  * Creates the default origami user

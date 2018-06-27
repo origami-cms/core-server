@@ -1,8 +1,7 @@
-import {Origami} from 'origami-core-lib';
-import {Route} from '../../Router';
+import {Origami, Route} from 'origami-core-lib';
 const pluralize = require('pluralize');
 
-import auth from '../../middleware/auth';
+import {auth} from 'origami-plugin-auth';
 
 export type methods = 'get' | 'head' | 'post' | 'put' | 'delete' | 'list';
 export type controllers = 'list' | 'create' | 'get' | 'update' | 'delete';

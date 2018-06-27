@@ -1,6 +1,5 @@
+import {auth, config, error, Origami} from 'origami-core-lib';
 import Server from '../server';
-import {Origami, config, error} from 'origami-core-lib';
-import * as auth from '../lib/auth';
 
 /**
  * Creates the default origami user
@@ -22,7 +21,7 @@ export default async(app: Server) => {
         fname: 'origami',
         lname: 'cms',
         email: 'bot@origamicms.com',
-        password: await auth.passwordHash(c.store.password)
+        password: await auth.hash(c.store.password)
     };
 
     await modelUser.create(user);

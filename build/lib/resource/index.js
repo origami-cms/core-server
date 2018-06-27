@@ -1,11 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-}
 Object.defineProperty(exports, "__esModule", { value: true });
-const Router_1 = require("../../Router");
+const origami_core_lib_1 = require("origami-core-lib");
 const pluralize = require('pluralize');
-const auth_1 = __importDefault(require("../../middleware/auth"));
+const origami_plugin_auth_1 = require("origami-plugin-auth");
 class Resource {
     constructor(resource, store, options) {
         this.resource = resource;
@@ -13,7 +10,7 @@ class Resource {
         this.options = options;
         this.resourcePlural = pluralize(resource);
         this.resource = pluralize.singular(resource);
-        this.router = new Router_1.Route(`/api/v1/${this.resourcePlural}`)
+        this.router = new origami_core_lib_1.Route(`/api/v1/${this.resourcePlural}`)
             .position('store');
         this.subRouter = this.router.route(`/:${this.resource}Id`)
             .position('store');
@@ -147,7 +144,7 @@ class Resource {
             }
         }
         if (useAuth === null || useAuth)
-            return auth_1.default(req, res, next);
+            return origami_plugin_auth_1.auth(req, res, next);
         next();
     }
 }

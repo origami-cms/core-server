@@ -1,5 +1,4 @@
-import { Origami } from 'origami-core-lib';
-import { Route } from '../../Router';
+import { Origami, Route } from 'origami-core-lib';
 export declare type methods = 'get' | 'head' | 'post' | 'put' | 'delete' | 'list';
 export declare type controllers = 'list' | 'create' | 'get' | 'update' | 'delete';
 export interface ResourceOptions {

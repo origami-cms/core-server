@@ -1,9 +1,9 @@
-import {Route} from '../../Router';
-
 import express from 'express';
+import {Origami, Route} from 'origami-core-lib';
 import path from 'path';
 import theme, {TemplateFile} from '../../lib/theme/Theme';
-import {Origami} from 'origami-core-lib';
+
+export {Route} from 'origami-core-lib';
 
 
 export default class ThemeController {

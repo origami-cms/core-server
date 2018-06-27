@@ -5,15 +5,13 @@ import express, {Application, Router} from 'express';
 import upload from 'express-fileupload';
 import helmet from 'helmet';
 import {Http2Server} from 'http2';
-import {config, error, Origami, requireKeys, success, requireLib} from 'origami-core-lib';
+import {error, Origami, requireKeys, requireLib, Route, RouterListItem, success} from 'origami-core-lib';
 import path from 'path';
-import theme from './controllers/theme';
 import Resource, {ResourceOptions} from './lib/resource';
 import mwErrors from './middleware/errors';
 import mwFormat from './middleware/format';
 import Options from './Options';
 import defaultPlugins from './plugins';
-import {Route, RouterListItem} from './Router';
 import runScripts from './scripts';
 
 
@@ -26,10 +24,7 @@ type positionRouters = {
 
 const DEFAULT_PORT = 8080;
 
-
-export {Route} from './Router';
 export {lib} from './lib';
-export {default as Auth} from './middleware/auth';
 
 export default class Server {
     app: Application;

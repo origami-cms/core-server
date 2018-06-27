@@ -83,7 +83,7 @@ exports.default = new class Theme {
     load(theme) {
         this.config.name = theme;
         this.config = require(path_1.default.resolve(this.pathTheme, 'theme.json'));
-        this.config.paths = lodash_1.default.mapValues(this.config.paths, v => path_1.default.resolve(this.pathTheme, v));
+        this.config.paths = lodash_1.default.mapValues(this.config.paths, v => path_1.default.resolve(this.pathTheme, v || ''));
     }
     getPageTypeProperties(type) {
         try {

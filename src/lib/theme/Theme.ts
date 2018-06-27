@@ -110,7 +110,7 @@ export default new class Theme {
         this.config = require(path.resolve(this.pathTheme, 'theme.json'));
 
         this.config.paths = _.mapValues(this.config.paths, v =>
-            path.resolve(this.pathTheme, v)
+            path.resolve(this.pathTheme, v || '')
         );
     }
 

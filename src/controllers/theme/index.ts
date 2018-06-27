@@ -1,5 +1,5 @@
 import ThemeController from './ThemeController';
-import {Route} from '../../Router';
+import {Route} from 'origami-core-lib';
 
 
 export default async (initialTheme: string) => {

@@ -3,13 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-const Router_1 = require("../../Router");
 const express_1 = __importDefault(require("express"));
+const origami_core_lib_1 = require("origami-core-lib");
 const path_1 = __importDefault(require("path"));
 const Theme_1 = __importDefault(require("../../lib/theme/Theme"));
+var origami_core_lib_2 = require("origami-core-lib");
+exports.Route = origami_core_lib_2.Route;
 class ThemeController {
     constructor(initialTheme) {
-        this.route = new Router_1.Route().position('render');
+        this.route = new origami_core_lib_1.Route().position('render');
         this.initialTheme = initialTheme;
     }
     async setup() {
