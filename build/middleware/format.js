@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-const status_1 = __importDefault(require("../lib/status"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
+const status_1 = __importDefault(require("../lib/status"));
 exports.default = () => {
     const fn = async (req, res, next) => {
         await next();
@@ -12,7 +12,7 @@ exports.default = () => {
             status_1.default(res, res.responseCode, http_status_codes_1.default.OK);
         let body = res.body || res.text || res.data;
         // If it's a json request, wrap the data as json
-        // NOTE: Attemtped req.is(), however there seemed to be a bug
+        // NOTE: Attempted req.is(), however there seemed to be a bug
         if (req.headers['content-type'] === 'application/json' ||
             req.path.indexOf('/api') === 0 ||
             res.data && !res.body) {

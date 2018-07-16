@@ -11,11 +11,12 @@ const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const helmet_1 = __importDefault(require("helmet"));
 const origami_core_lib_1 = require("origami-core-lib");
 const path_1 = __importDefault(require("path"));
+const defaultPlugins_1 = __importDefault(require("./defaultPlugins"));
 const resource_1 = __importDefault(require("./lib/resource"));
+const app_1 = __importDefault(require("./lib/app"));
 const errors_1 = __importDefault(require("./middleware/errors"));
 const format_1 = __importDefault(require("./middleware/format"));
 const Options_1 = __importDefault(require("./Options"));
-const plugins_1 = __importDefault(require("./plugins"));
 const scripts_1 = __importDefault(require("./scripts"));
 const listEndPoints = require('express-list-endpoints');
 const DEFAULT_PORT = 8080;
@@ -23,6 +24,7 @@ var lib_1 = require("./lib");
 exports.lib = lib_1.lib;
 class Server {
     constructor(options, store) {
+        this.apps = {};
         this.app = express_1.default();
         this.store = store;
         // Assign these to a singleton class so they can be use across the server
@@ -65,6 +67,7 @@ class Server {
         this._setup();
         this.app.set('ln', this._options.ln);
         this.app.set('secret', this._options.secret);
+        this.app.set('apps', this.apps);
     }
     // Runs the app
     serve() {
@@ -107,6 +110,12 @@ class Server {
             await plugin(this, settings);
         }
     }
+    async application(name, settings) {
+        if (Boolean(settings)) {
+            const app = new app_1.default(name, this, settings);
+            await app.setup();
+        }
+    }
     resource(name, options) {
         const c = new resource_1.default(name, this.store, options);
         this.useRouter(c.router);
@@ -134,23 +143,8 @@ class Server {
         }));
         this.app.use(corser_1.default.create());
         await this._setupStatic();
-        // Generate the position routers...
-        await this._setupPositions();
         // Setup the middleware
         await this._setupMiddleware();
-    }
-    async _setupPositions() {
-        // // Load initial theme
-        // let initialTheme = null;
-        // const [setting] = await this.store.model('setting').find({setting: 'theme'});
-        // if (setting) initialTheme = setting.value;
-        // const c = await config.read();
-        // if (c && c.theme) {
-        //     if (c.theme.name) initialTheme = c.theme.name;
-        //     else if (c.theme.path) initialTheme = c.theme.path;
-        // }
-        // // Setup Theme
-        // if (initialTheme) this.useRouter(await theme(initialTheme));
     }
     async _setupMiddleware() {
         this._position('init');
@@ -184,7 +178,7 @@ class Server {
         }
     }
     async _setupDefaultPlugins() {
-        Object.entries(plugins_1.default).forEach(async ([name, settings]) => {
+        Object.entries(defaultPlugins_1.default).forEach(async ([name, settings]) => {
             await this.plugin(name, settings);
         });
     }

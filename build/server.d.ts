@@ -6,6 +6,9 @@ export { lib } from './lib';
 export default class Server {
     app: Application;
     store: any;
+    apps: {
+        [name: string]: Origami.AppManifest;
+    };
     private _positions;
     private _positionRouters;
     private _options;
@@ -16,10 +19,10 @@ export default class Server {
     stop(): void;
     useRouter(router: Route): void;
     plugin(name: string, settings: boolean | object): Promise<void>;
+    application(name: string, settings: boolean | object): Promise<void>;
     resource(name: string, options: ResourceOptions): Resource;
     static(path: string, prefix?: string): void;
     private _setup();
-    private _setupPositions();
     private _setupMiddleware();
     private _setupStatic();
     private _setupDefaultPlugins();

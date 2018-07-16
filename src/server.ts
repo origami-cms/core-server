@@ -7,11 +7,12 @@ import helmet from 'helmet';
 import {Http2Server} from 'http2';
 import {error, Origami, requireKeys, requireLib, Route, RouterListItem, success} from 'origami-core-lib';
 import path from 'path';
+import defaultPlugins from './defaultPlugins';
 import Resource, {ResourceOptions} from './lib/resource';
+import App from './lib/app';
 import mwErrors from './middleware/errors';
 import mwFormat from './middleware/format';
 import Options from './Options';
-import defaultPlugins from './plugins';
 import runScripts from './scripts';
 
 
@@ -29,6 +30,7 @@ export {lib} from './lib';
 export default class Server {
     app: Application;
     store: any;
+    apps: {[name: string]: Origami.AppManifest} = {};
 
     private _positions: Origami.Server.Position[];
     private _positionRouters: positionRouters;
@@ -41,7 +43,6 @@ export default class Server {
         options: Origami.ConfigServer,
         store: any
     ) {
-
         this.app = express();
         this.store = store;
 
@@ -103,6 +104,7 @@ export default class Server {
 
         this.app.set('ln', this._options.ln);
         this.app.set('secret', this._options.secret);
+        this.app.set('apps', this.apps);
     }
 
 
@@ -168,6 +170,14 @@ export default class Server {
     }
 
 
+    async application(name: string, settings: boolean | object) {
+        if (Boolean(settings)) {
+            const app = new App(name, this, settings);
+            await app.setup();
+        }
+    }
+
+
     resource(name: string, options: ResourceOptions) {
         const c = new Resource(name, this.store, options);
         this.useRouter(c.router);
@@ -204,27 +214,8 @@ export default class Server {
 
         await this._setupStatic();
 
-        // Generate the position routers...
-        await this._setupPositions();
-
         // Setup the middleware
         await this._setupMiddleware();
-    }
-
-
-    private async _setupPositions() {
-        // // Load initial theme
-        // let initialTheme = null;
-        // const [setting] = await this.store.model('setting').find({setting: 'theme'});
-        // if (setting) initialTheme = setting.value;
-        // const c = await config.read();
-        // if (c && c.theme) {
-        //     if (c.theme.name) initialTheme = c.theme.name;
-        //     else if (c.theme.path) initialTheme = c.theme.path;
-        // }
-
-        // // Setup Theme
-        // if (initialTheme) this.useRouter(await theme(initialTheme));
     }
 
 

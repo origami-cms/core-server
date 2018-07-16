@@ -1,8 +1,8 @@
-import {Origami} from 'origami-core-lib';
-import {NextFunction, Response, RequestHandler} from 'express';
-
-import status from '../lib/status';
+import {NextFunction, RequestHandler} from 'express';
 import http from 'http-status-codes';
+import {Origami} from 'origami-core-lib';
+import status from '../lib/status';
+
 
 export default (): RequestHandler => {
     interface Returning {
@@ -22,7 +22,7 @@ export default (): RequestHandler => {
         let body = res.body || res.text || res.data;
 
         // If it's a json request, wrap the data as json
-        // NOTE: Attemtped req.is(), however there seemed to be a bug
+        // NOTE: Attempted req.is(), however there seemed to be a bug
         if (
             req.headers['content-type'] === 'application/json' ||
             req.path.indexOf('/api') === 0 ||
