@@ -128,12 +128,6 @@ export default class Server {
         this._positions.forEach(p => {
             const pr = this._positionRouters[p];
 
-            interface obj {
-                path: Origami.Server.URL;
-                handlers: Function[];
-                method: Origami.Server.Method;
-            }
-
 
             router.routers[p].forEach(({path, handlers, method}: RouterListItem) => {
                 const p = (path || '').toString();
@@ -187,8 +181,9 @@ export default class Server {
 
     // Wrapper for express.static
     static(path: string, prefix?: string) {
-        if (!prefix) this.app.use(express.static(path));
-        else this.app.use(prefix, express.static(path));
+        const r = new Route(prefix || '/');
+        r.use(express.static(path));
+        this.useRouter(r);
     }
 
 

@@ -123,10 +123,9 @@ class Server {
     }
     // Wrapper for express.static
     static(path, prefix) {
-        if (!prefix)
-            this.app.use(express_1.default.static(path));
-        else
-            this.app.use(prefix, express_1.default.static(path));
+        const r = new origami_core_lib_1.Route(prefix || '/');
+        r.use(express_1.default.static(path));
+        this.useRouter(r);
     }
     // Registers all the middleware and serves the app
     async _setup() {

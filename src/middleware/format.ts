@@ -17,6 +17,7 @@ export default (): RequestHandler => {
         next: NextFunction
     ) => {
         await next();
+        if (res.headersSent) return;
         if (res.responseCode) status(res, res.responseCode, http.OK);
 
         let body = res.body || res.text || res.data;

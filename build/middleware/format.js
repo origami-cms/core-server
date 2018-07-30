@@ -8,6 +8,8 @@ const status_1 = __importDefault(require("../lib/status"));
 exports.default = () => {
     const fn = async (req, res, next) => {
         await next();
+        if (res.headersSent)
+            return;
         if (res.responseCode)
             status_1.default(res, res.responseCode, http_status_codes_1.default.OK);
         let body = res.body || res.text || res.data;
