@@ -15,9 +15,6 @@ import mwFormat from './middleware/format';
 import Options from './Options';
 import runScripts from './scripts';
 
-
-const listEndPoints = require('express-list-endpoints');
-
 type positionRouters = {
     [K in Origami.Server.Position]: Router
 };

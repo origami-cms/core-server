@@ -1,7 +1,11 @@
-import {Origami, requireLib, error, Route, resolveLib} from 'origami-core-lib';
-import Server from '../../server';
 import express from 'express';
+import {readdir} from 'fs';
+import {error, Origami, requireLib, resolveLib, Route} from 'origami-core-lib';
 import path from 'path';
+import {promisify} from 'util';
+import Server from '../../server';
+
+const readDir = promisify(readdir);
 
 export default class App {
     manifest?: Origami.AppManifest;
@@ -31,19 +35,22 @@ export default class App {
     async setup() {
         const m = await this._loadManifest() as Origami.AppManifest;
 
+
         // Attempt to register the app on the Server
         this._registerApp();
 
         // Initialize the app router (/api/v1/apps/:appName)
         this.server.useRouter(
-            this._setupRouter() as Route
+            this._setupFileRouter() as Route
         );
+
+        this._setupAppRoutes();
     }
 
 
     // Load the app's manifest file, and throw error if there is none
     private async _loadManifest() {
-        const location = [`${this.name}/manifest.js`, __dirname, 'origami-app-'];
+        const location = [`${this.name}/manifest.js`, process.cwd(), 'origami-app-'];
         const manifest: Origami.AppManifest = await requireLib.apply(this, location);
 
         if (!manifest) return error(new Error(`Could not load app ${this.name}`));
@@ -68,7 +75,7 @@ export default class App {
     }
 
 
-    private _setupRouter() {
+    private _setupFileRouter() {
         if (!this.manifest || !this._dir) return error(new Error('App\'s manifest is not loaded'));
 
         // Create the main router for the app
@@ -88,5 +95,18 @@ export default class App {
         });
 
         return this.router;
+    }
+
+
+    private async _setupAppRoutes() {
+        try {
+            const routesPath = path.join(this._dir as string, 'routes');
+            (await readDir(routesPath))
+                .filter(f => f.endsWith('.js'))
+                .forEach(f => {
+                    const route = require(path.join(routesPath, f));
+                    route(this.server, this.settings);
+                });
+        } catch {}
     }
 }

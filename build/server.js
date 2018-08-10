@@ -18,7 +18,6 @@ const errors_1 = __importDefault(require("./middleware/errors"));
 const format_1 = __importDefault(require("./middleware/format"));
 const Options_1 = __importDefault(require("./Options"));
 const scripts_1 = __importDefault(require("./scripts"));
-const listEndPoints = require('express-list-endpoints');
 const DEFAULT_PORT = 8080;
 var lib_1 = require("./lib");
 exports.lib = lib_1.lib;

@@ -14,5 +14,6 @@ export default class App {
     setup(): Promise<void>;
     private _loadManifest();
     private _registerApp();
-    private _setupRouter();
+    private _setupFileRouter();
+    private _setupAppRoutes();
 }
