@@ -17,6 +17,7 @@
     "corser": "^2.0.1",
     "express": "^4.15.4",
     "express-fileupload": "^0.4.0",
+    "express-static-gzip": "^1.1.1",
     "helmet": "^3.12.0",
     "http-status-codes": "^1.3.0",
     "json-query": "^2.2.2",

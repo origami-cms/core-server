@@ -8,12 +8,14 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const corser_1 = __importDefault(require("corser"));
 const express_1 = __importDefault(require("express"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
+// @ts-ignore
+const express_static_gzip_1 = __importDefault(require("express-static-gzip"));
 const helmet_1 = __importDefault(require("helmet"));
 const origami_core_lib_1 = require("origami-core-lib");
 const path_1 = __importDefault(require("path"));
 const defaultPlugins_1 = __importDefault(require("./defaultPlugins"));
-const resource_1 = __importDefault(require("./lib/resource"));
 const app_1 = __importDefault(require("./lib/app"));
+const resource_1 = __importDefault(require("./lib/resource"));
 const errors_1 = __importDefault(require("./middleware/errors"));
 const format_1 = __importDefault(require("./middleware/format"));
 const Options_1 = __importDefault(require("./Options"));
@@ -120,10 +122,11 @@ class Server {
         this.useRouter(c.router);
         return c;
     }
-    // Wrapper for express.static
+    // Wrapper for staticGzip
     static(path, prefix) {
         const r = new origami_core_lib_1.Route(prefix || '/');
-        r.use(express_1.default.static(path));
+        // r.use(express.static(path));
+        r.use(express_static_gzip_1.default(path));
         this.useRouter(r);
     }
     // Registers all the middleware and serves the app

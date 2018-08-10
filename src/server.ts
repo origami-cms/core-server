@@ -3,13 +3,15 @@ import bodyParser from 'body-parser';
 import corser from 'corser';
 import express, {Application, Router} from 'express';
 import upload from 'express-fileupload';
+// @ts-ignore
+import staticGzip from 'express-static-gzip';
 import helmet from 'helmet';
 import {Http2Server} from 'http2';
 import {error, Origami, requireKeys, requireLib, Route, RouterListItem, success} from 'origami-core-lib';
 import path from 'path';
 import defaultPlugins from './defaultPlugins';
-import Resource, {ResourceOptions} from './lib/resource';
 import App from './lib/app';
+import Resource, {ResourceOptions} from './lib/resource';
 import mwErrors from './middleware/errors';
 import mwFormat from './middleware/format';
 import Options from './Options';
@@ -23,7 +25,6 @@ type positionRouters = {
 const DEFAULT_PORT = 8080;
 
 export {lib} from './lib';
-
 export default class Server {
     app: Application;
     store: any;
@@ -176,10 +177,11 @@ export default class Server {
     }
 
 
-    // Wrapper for express.static
+    // Wrapper for staticGzip
     static(path: string, prefix?: string) {
         const r = new Route(prefix || '/');
-        r.use(express.static(path));
+        // r.use(express.static(path));
+        r.use(staticGzip(path));
         this.useRouter(r);
     }
 
