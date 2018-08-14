@@ -38,6 +38,11 @@ export default class App {
         // Attempt to register the app on the Server
         this._registerApp();
 
+
+        // Create the main router for the app
+        this.router = new Route(this.api as string);
+
+
         // Initialize the app router (/api/v1/apps/:appName)
         this.server.useRouter(
             this._setupFileRouter() as Route
@@ -78,19 +83,16 @@ export default class App {
     private _setupFileRouter() {
         if (!this.manifest || !this._dir) return error(new Error('App\'s manifest is not loaded'));
 
-        // Create the main router for the app
-        const r = this.router = new Route(this.api as string);
 
-        ['pages', 'scripts'].forEach(dir => r
+        ['pages', 'scripts'].forEach(dir => this.router!
             .route(`/${dir}`)
             // TODO: convert to gzip serve
             .use(express.static(path.resolve(this._dir as string, dir)))
         );
 
-
         // Setup basic route for retrieving the manifest
         // EG: GET /api/v1/apps/:appName
-        this.router.get((req, res, next) => {
+        this.router!.get((req, res, next) => {
             res.data = this.manifest;
             next();
         });

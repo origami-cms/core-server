@@ -30,6 +30,8 @@ class App {
         await this._loadManifest();
         // Attempt to register the app on the Server
         this._registerApp();
+        // Create the main router for the app
+        this.router = new origami_core_lib_1.Route(this.api);
         // Initialize the app router (/api/v1/apps/:appName)
         this.server.useRouter(this._setupFileRouter());
         await this._setupAppModels();
@@ -58,9 +60,7 @@ class App {
     _setupFileRouter() {
         if (!this.manifest || !this._dir)
             return origami_core_lib_1.error(new Error('App\'s manifest is not loaded'));
-        // Create the main router for the app
-        const r = this.router = new origami_core_lib_1.Route(this.api);
-        ['pages', 'scripts'].forEach(dir => r
+        ['pages', 'scripts'].forEach(dir => this.router
             .route(`/${dir}`)
             .use(express_1.default.static(path_1.default.resolve(this._dir, dir))));
         // Setup basic route for retrieving the manifest
@@ -71,7 +71,6 @@ class App {
         });
         return this.router;
     }
-    // private _setup
     async _setupAppModels() {
         return this._loadFiles('models', (f, model) => {
             this.server.store.model(f, model);
