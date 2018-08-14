@@ -33,8 +33,7 @@ export default class App {
 
 
     async setup() {
-        const m = await this._loadManifest() as Origami.AppManifest;
-
+        await this._loadManifest() as Origami.AppManifest;
 
         // Attempt to register the app on the Server
         this._registerApp();
@@ -44,7 +43,8 @@ export default class App {
             this._setupFileRouter() as Route
         );
 
-        this._setupAppRoutes();
+        await this._setupAppModels();
+        await this._setupAppRoutes();
     }
 
 
@@ -83,6 +83,7 @@ export default class App {
 
         ['pages', 'scripts'].forEach(dir => r
             .route(`/${dir}`)
+            // TODO: convert to gzip serve
             .use(express.static(path.resolve(this._dir as string, dir)))
         );
 
@@ -98,15 +99,43 @@ export default class App {
     }
 
 
+    private async _setupAppModels() {
+        return this._loadFiles('models', (f, model) => {
+            this.server.store.model(f, model);
+        });
+    }
+
     private async _setupAppRoutes() {
+        return this._loadFiles('routes', (f, route) => {
+            route(this.server, this.settings);
+        });
+    }
+
+
+    // Run a function over each file in the app's subdirectory (route, model, etc)
+    private async _loadFiles(
+        type: 'routes' | 'models',
+        func: (f: string, m: any) => void,
+        filetype: string = 'js'
+    ) {
+
+        const fp = path.join(this._dir as string, type);
+        let files;
+
         try {
-            const routesPath = path.join(this._dir as string, 'routes');
-            (await readDir(routesPath))
-                .filter(f => f.endsWith('.js'))
-                .forEach(f => {
-                    const route = require(path.join(routesPath, f));
-                    route(this.server, this.settings);
-                });
-        } catch {}
+            files = (await readDir(fp))
+                .filter(f => f.endsWith(`.${filetype}`))
+                .map(f => path.join(fp, f));
+        // No folder
+        } catch { return false; }
+
+        try {
+            return files.map(f => func(
+                path.basename(f).slice(0, (filetype.length + 1) * -1),
+                require(f)
+            ));
+        } catch (e) {
+            error(`Error in loading app '${this.name}' ${type}`, e);
+        }
     }
 }

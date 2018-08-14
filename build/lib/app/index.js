@@ -27,12 +27,13 @@ class App {
         return this._prefix + this.appName;
     }
     async setup() {
-        const m = await this._loadManifest();
+        await this._loadManifest();
         // Attempt to register the app on the Server
         this._registerApp();
         // Initialize the app router (/api/v1/apps/:appName)
         this.server.useRouter(this._setupFileRouter());
-        this._setupAppRoutes();
+        await this._setupAppModels();
+        await this._setupAppRoutes();
     }
     // Load the app's manifest file, and throw error if there is none
     async _loadManifest() {
@@ -70,17 +71,36 @@ class App {
         });
         return this.router;
     }
+    // private _setup
+    async _setupAppModels() {
+        return this._loadFiles('models', (f, model) => {
+            this.server.store.model(f, model);
+        });
+    }
     async _setupAppRoutes() {
+        return this._loadFiles('routes', (f, route) => {
+            route(this.server, this.settings);
+        });
+    }
+    // Run a function over each file in the app's subdirectory (route, model, etc)
+    async _loadFiles(type, func, filetype = 'js') {
+        const fp = path_1.default.join(this._dir, type);
+        let files;
         try {
-            const routesPath = path_1.default.join(this._dir, 'routes');
-            (await readDir(routesPath))
-                .filter(f => f.endsWith('.js'))
-                .forEach(f => {
-                const route = require(path_1.default.join(routesPath, f));
-                route(this.server, this.settings);
-            });
+            files = (await readDir(fp))
+                .filter(f => f.endsWith(`.${filetype}`))
+                .map(f => path_1.default.join(fp, f));
+            // No folder
         }
-        catch (_a) { }
+        catch (_a) {
+            return false;
+        }
+        try {
+            return files.map(f => func(path_1.default.basename(f).slice(0, (filetype.length + 1) * -1), require(f)));
+        }
+        catch (e) {
+            origami_core_lib_1.error(`Error in loading app '${this.name}' ${type}`, e);
+        }
     }
 }
 exports.default = App;

@@ -15,5 +15,7 @@ export default class App {
     private _loadManifest();
     private _registerApp();
     private _setupFileRouter();
+    private _setupAppModels();
     private _setupAppRoutes();
+    private _loadFiles(type, func, filetype?);
 }
