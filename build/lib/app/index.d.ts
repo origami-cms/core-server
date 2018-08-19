@@ -17,5 +17,6 @@ export default class App {
     private _setupFileRouter();
     private _setupAppModels();
     private _setupAppRoutes();
+    private _setupAppResources();
     private _loadFiles(type, func, filetype?);
 }

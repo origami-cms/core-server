@@ -76,8 +76,7 @@ export default class Resource {
             );
         });
 
-
-        this.store.model(resource, options.model);
+        if (!this.store.models[resource]) this.store.model(resource, options.model);
     }
 
     /**

@@ -36,6 +36,7 @@ class App {
         this.server.useRouter(this._setupFileRouter());
         await this._setupAppModels();
         await this._setupAppRoutes();
+        await this._setupAppResources();
     }
     // Load the app's manifest file, and throw error if there is none
     async _loadManifest() {
@@ -80,6 +81,13 @@ class App {
         return this._loadFiles('routes', (f, route) => {
             route(this.server, this.settings);
         });
+    }
+    async _setupAppResources() {
+        if (this.manifest.resources) {
+            origami_core_lib_1.config.setupResources(
+            // @ts-ignore
+            { resources: this.manifest.resources }, this.server, this._dir);
+        }
     }
     // Run a function over each file in the app's subdirectory (route, model, etc)
     async _loadFiles(type, func, filetype = 'js') {

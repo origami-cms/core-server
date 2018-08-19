@@ -44,7 +44,8 @@ class Resource {
             }
             rMethod.bind(this.subRouter)(this._auth.bind(this), cMethod.bind(this));
         });
-        this.store.model(resource, options.model);
+        if (!this.store.models[resource])
+            this.store.model(resource, options.model);
     }
     /**
      * Get the ID of the request

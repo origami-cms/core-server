@@ -1,6 +1,6 @@
 import express from 'express';
 import {readdir} from 'fs';
-import {error, Origami, requireLib, resolveLib, Route} from 'origami-core-lib';
+import {error, Origami, requireLib, resolveLib, Route, config} from 'origami-core-lib';
 import path from 'path';
 import {promisify} from 'util';
 import Server from '../../server';
@@ -50,6 +50,7 @@ export default class App {
 
         await this._setupAppModels();
         await this._setupAppRoutes();
+        await this._setupAppResources();
     }
 
 
@@ -111,6 +112,17 @@ export default class App {
         return this._loadFiles('routes', (f, route) => {
             route(this.server, this.settings);
         });
+    }
+
+    private async _setupAppResources() {
+        if (this.manifest!.resources) {
+            config.setupResources(
+                // @ts-ignore
+                {resources: this.manifest!.resources},
+                this.server,
+                this._dir
+            );
+        }
     }
 
 
