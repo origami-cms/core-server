@@ -28,7 +28,7 @@
     "origami-core-server": "^0.3.7",
     "origami-core-server-statuses": "^0.0.8",
     "origami-plugin-auth": "^1.0.0",
-    "origami-plugin-core-api": "^0.1.3",
+    "origami-plugin-core-api": "^0.1.4",
     "origami-plugin-media": "^1.0.1",
     "origami-plugin-user-profiles": "^1.0.1",
     "pluralize": "^7.0.0",
