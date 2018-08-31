@@ -110,6 +110,11 @@ export default class App {
 
     private async _setupAppRoutes() {
         return this._loadFiles('routes', (f, route) => {
+            if (typeof route !== 'function') {
+                return error(new Error(
+                    `Application ${this.name} has route '${f}' that does not export a function`
+                ));
+            }
             route(this.server, this.settings);
         });
     }

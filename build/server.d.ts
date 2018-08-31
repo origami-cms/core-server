@@ -14,6 +14,7 @@ export default class Server {
     private _options;
     private _plugins?;
     private _server?;
+    private _namedMiddleware;
     constructor(options: Origami.ConfigServer, store: any);
     serve(): void;
     stop(): void;
@@ -21,6 +22,7 @@ export default class Server {
     plugin(name: string, settings: boolean | object): Promise<void>;
     application(name: string, settings: boolean | object): Promise<void>;
     resource(name: string, options: ResourceOptions): Resource;
+    namedMiddleware(name: string, handler: Origami.Server.RequestHandler): void;
     static(path: string, prefix?: string): void;
     private _setup();
     private _setupMiddleware();

@@ -26,6 +26,7 @@ exports.lib = lib_1.lib;
 class Server {
     constructor(options, store) {
         this.apps = {};
+        this._namedMiddleware = {};
         this.app = express_1.default();
         this.store = store;
         // Assign these to a singleton class so they can be use across the server
@@ -86,10 +87,20 @@ class Server {
         this._positions.forEach(p => {
             const pr = this._positionRouters[p];
             router.routers[p].forEach(({ path, handlers, method }) => {
+                // Convert all the named handlers (EG: router.use('auth')) into request handlers
+                const mappedNamedHandlers = handlers.map(h => {
+                    if (typeof h === 'function')
+                        return h;
+                    if (!this._namedMiddleware[h]) {
+                        origami_core_lib_1.error('Server', `Cannot load middleware with name '${h}'`);
+                        return;
+                    }
+                    return this._namedMiddleware[h];
+                }).filter(h => h);
                 const p = (path || '').toString();
                 try {
                     const m = method.toLowerCase();
-                    pr[m](path, handlers);
+                    pr[m](path, mappedNamedHandlers);
                     origami_core_lib_1.success('Server', `Connected ${p} route: `, method.toUpperCase().blue, p.blue);
                 }
                 catch (e) {
@@ -121,6 +132,12 @@ class Server {
         const c = new resource_1.default(name, this.store, options);
         this.useRouter(c.router);
         return c;
+    }
+    namedMiddleware(name, handler) {
+        if (this._namedMiddleware[name]) {
+            return origami_core_lib_1.error('Server', `Middleware handler with name '${name}' already exists`);
+        }
+        this._namedMiddleware[name] = handler;
     }
     // Wrapper for staticGzip
     static(path, prefix) {

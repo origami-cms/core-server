@@ -35,6 +35,7 @@ export default class Server {
     private _options: Origami.ConfigServer;
     private _plugins?: Origami.Config['plugins'];
     private _server?: Http2Server;
+    private _namedMiddleware: {[name: string]: Origami.Server.RequestHandler} = {};
 
 
     constructor(
@@ -128,10 +129,20 @@ export default class Server {
 
 
             router.routers[p].forEach(({path, handlers, method}: RouterListItem) => {
+                // Convert all the named handlers (EG: router.use('auth')) into request handlers
+                const mappedNamedHandlers = handlers.map(h => {
+                    if (typeof h === 'function') return h;
+                    if (!this._namedMiddleware[h]) {
+                        error('Server', `Cannot load middleware with name '${h}'`);
+                        return;
+                    }
+                    return this._namedMiddleware[h];
+                }).filter(h => h);
+
                 const p = (path || '').toString();
                 try {
                     const m = method.toLowerCase() as keyof Router;
-                    (pr[m] as Function)(path, handlers);
+                    (pr[m] as Function)(path, mappedNamedHandlers);
                     success('Server', `Connected ${p} route: `, method.toUpperCase().blue, p.blue);
                 } catch (e) {
                     error(
@@ -150,7 +161,6 @@ export default class Server {
             let plugin;
 
             plugin = await requireLib(name, __dirname, 'origami-plugin-');
-
 
             if (!plugin) return error(new Error(`Could not load plugin ${name}`));
             if (typeof plugin !== 'function') {
@@ -174,6 +184,15 @@ export default class Server {
         const c = new Resource(name, this.store, options);
         this.useRouter(c.router);
         return c;
+    }
+
+
+    namedMiddleware(name: string, handler: Origami.Server.RequestHandler) {
+        if (this._namedMiddleware[name]) {
+            return error('Server', `Middleware handler with name '${name}' already exists`);
+        }
+
+        this._namedMiddleware[name] = handler;
     }
 
 

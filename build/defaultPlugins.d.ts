@@ -1,4 +1,5 @@
 declare const _default: {
+    auth: boolean;
     'core-api': boolean;
     'user-profiles': boolean;
     media: {

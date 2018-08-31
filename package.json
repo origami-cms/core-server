@@ -24,7 +24,7 @@
     "lodash": "^4.17.4",
     "marked": "^0.3.6",
     "npm-programmatic": "^0.0.10",
-    "origami-core-lib": "^0.3.12",
+    "origami-core-lib": "^0.3.13-alpha.1",
     "origami-core-server": "^0.3.7",
     "origami-core-server-statuses": "^0.0.8",
     "origami-plugin-auth": "^1.0.0",
