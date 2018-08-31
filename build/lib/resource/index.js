@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const origami_core_lib_1 = require("origami-core-lib");
 const pluralize = require('pluralize');
+// @ts-ignore
 const origami_plugin_auth_1 = require("origami-plugin-auth");
 class Resource {
     constructor(resource, store, options) {

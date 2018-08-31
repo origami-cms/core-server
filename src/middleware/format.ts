@@ -1,6 +1,6 @@
 import {NextFunction, RequestHandler} from 'express';
 import http from 'http-status-codes';
-import {Origami} from 'origami-core-lib';
+import {Origami, error} from 'origami-core-lib';
 import status from '../lib/status';
 
 
@@ -52,9 +52,9 @@ export default (): RequestHandler => {
             res.status(http.NOT_FOUND);
             // If it's a page request, redirect
             if (typeof req.headers.accept !== 'string') {
-                throw new Error('accept header should be a string');
+                error('accept header should be a string');
             }
-            if (req.headers.accept.includes('text/html')) {
+            if (req.headers.accept && req.headers.accept.includes('text/html')) {
                 if (req.url === '/404') res.send('Not found');
                 else res.redirect('/404');
             }

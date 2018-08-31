@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
+const origami_core_lib_1 = require("origami-core-lib");
 const status_1 = __importDefault(require("../lib/status"));
 exports.default = () => {
     const fn = async (req, res, next) => {
@@ -39,9 +40,9 @@ exports.default = () => {
             res.status(http_status_codes_1.default.NOT_FOUND);
             // If it's a page request, redirect
             if (typeof req.headers.accept !== 'string') {
-                throw new Error('accept header should be a string');
+                origami_core_lib_1.error('accept header should be a string');
             }
-            if (req.headers.accept.includes('text/html')) {
+            if (req.headers.accept && req.headers.accept.includes('text/html')) {
                 if (req.url === '/404')
                     res.send('Not found');
                 else

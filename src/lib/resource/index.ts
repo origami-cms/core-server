@@ -1,6 +1,7 @@
 import {Origami, Route} from 'origami-core-lib';
 const pluralize = require('pluralize');
 
+// @ts-ignore
 import {auth} from 'origami-plugin-auth';
 
 export type methods = 'get' | 'head' | 'post' | 'put' | 'delete' | 'list';
