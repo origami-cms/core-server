@@ -6,6 +6,7 @@ import Server from '../server';
  */
 export default async(app: Server) => {
     const store = await app.app.get('store') as Origami.Store.Store;
+    if (!store) return;
     const model = store.model('setting') as Origami.Store.Model;
 
     const existing = await model.find({setting: 'setup'}) as Origami.Store.Resource[];

@@ -27,7 +27,7 @@ const DEFAULT_PORT = 8080;
 export {lib} from './lib';
 export default class Server {
     app: Application;
-    store: any;
+    store?: any;
     apps: {[name: string]: Origami.AppManifest} = {};
 
     private _positions: Origami.Server.Position[];
@@ -40,7 +40,7 @@ export default class Server {
 
     constructor(
         options: Origami.ConfigServer,
-        store: any
+        store?: any
     ) {
         this.app = express();
         this.store = store;
@@ -181,6 +181,7 @@ export default class Server {
 
 
     resource(name: string, options: ResourceOptions) {
+        if (!this.store) return false;
         const c = new Resource(name, this.store, options);
         this.useRouter(c.router);
         return c;
@@ -208,7 +209,7 @@ export default class Server {
     // Registers all the middleware and serves the app
     private async _setup() {
         // Setup the store
-        this.app.set('store', this.store);
+        if (this.store) this.app.set('store', this.store);
 
 
         // Setup the default plugins

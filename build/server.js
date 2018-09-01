@@ -129,6 +129,8 @@ class Server {
         }
     }
     resource(name, options) {
+        if (!this.store)
+            return false;
         const c = new resource_1.default(name, this.store, options);
         this.useRouter(c.router);
         return c;
@@ -149,7 +151,8 @@ class Server {
     // Registers all the middleware and serves the app
     async _setup() {
         // Setup the store
-        this.app.set('store', this.store);
+        if (this.store)
+            this.app.set('store', this.store);
         // Setup the default plugins
         await this._setupDefaultPlugins();
         this.app.use(express_fileupload_1.default());

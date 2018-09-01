@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 exports.default = async (app) => {
     const store = await app.app.get('store');
+    if (!store)
+        return;
     const model = store.model('setting');
     const existing = await model.find({ setting: 'setup' });
     if (!existing.length) {

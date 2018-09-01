@@ -9,6 +9,8 @@ exports.default = async (app) => {
     if (!c)
         return origami_core_lib_1.error('Could not open config file');
     const store = await app.app.get('store');
+    if (!store)
+        return;
     const modelUser = store.model('user');
     const existing = await modelUser.find({ email: 'bot@origamicms.com' });
     if (existing instanceof Array && existing.length) {

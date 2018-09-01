@@ -9,6 +9,7 @@ export default async(app: Server) => {
     if (!c) return error('Could not open config file');
 
     const store = await app.app.get('store') as Origami.Store.Store;
+    if (!store) return;
     const modelUser = store.model('user') as Origami.Store.Model;
 
     const existing = await modelUser.find({email: 'bot@origamicms.com'});

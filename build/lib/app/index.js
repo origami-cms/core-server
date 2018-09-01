@@ -73,6 +73,8 @@ class App {
         return this.router;
     }
     async _setupAppModels() {
+        if (!this.server.store)
+            return;
         return this._loadFiles('models', (f, model) => {
             this.server.store.model(f, model);
         });
