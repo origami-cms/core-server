@@ -43,10 +43,9 @@ exports.default = () => {
                 origami_core_lib_1.error('accept header should be a string');
             }
             if (req.headers.accept && req.headers.accept.includes('text/html')) {
-                if (req.url === '/404')
-                    res.send('Not found');
-                else
+                if (req.url !== '404')
                     res.redirect('/404');
+                // if (req.url === '/404') res.send('Not found');
             }
             else
                 res.send();

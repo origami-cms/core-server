@@ -55,8 +55,8 @@ export default (): RequestHandler => {
                 error('accept header should be a string');
             }
             if (req.headers.accept && req.headers.accept.includes('text/html')) {
-                if (req.url === '/404') res.send('Not found');
-                else res.redirect('/404');
+                if (req.url !== '404') res.redirect('/404');
+                // if (req.url === '/404') res.send('Not found');
             }
             // Otherwise send nothing
             else res.send();
