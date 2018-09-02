@@ -164,7 +164,9 @@ export default class Server {
 
             if (!plugin) return error(new Error(`Could not load plugin ${name}`));
             if (typeof plugin !== 'function') {
-                return error(new Error(`Plugin ${name} does not export a function`));
+                // Allow for importing es6 modules with require (usually experted from typescript)
+                if (typeof plugin.default === 'function') plugin = plugin.default;
+                else return error(new Error(`Plugin ${name} does not export a function`));
             }
 
             await plugin(this, settings);
