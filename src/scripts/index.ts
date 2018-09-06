@@ -4,5 +4,5 @@ import initialConfig from './initialConfig';
 
 export default async(app: Server) => {
     // await rootUser(app);
-    await initialConfig(app);
+    // await initialConfig(app);
 };
