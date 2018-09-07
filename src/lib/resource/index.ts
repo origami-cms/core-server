@@ -201,7 +201,7 @@ export default class Resource {
 
                 if (set || set === false) useAuth = set;
             }
-        }
+        } else if (this.options.auth === false) useAuth = false;
 
 
         if (useAuth === null || useAuth) return auth(req, res, next);
