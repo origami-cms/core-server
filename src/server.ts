@@ -7,7 +7,16 @@ import upload from 'express-fileupload';
 import staticGzip from 'express-static-gzip';
 import helmet from 'helmet';
 import {Http2Server} from 'http2';
-import {error, info, Origami, requireKeys, requireLib, Route, RouterListItem, success} from 'origami-core-lib';
+import {
+    error,
+    info,
+    Origami,
+    requireKeys,
+    requireLib,
+    Route,
+    RouterListItem,
+    success
+} from 'origami-core-lib';
 import path from 'path';
 import App from './lib/app';
 import Resource, {ResourceOptions} from './lib/resource';
