@@ -31,7 +31,6 @@
     "@types/express": "^4.11.1",
     "@types/express-fileupload": "^0.1.1",
     "@types/helmet": "^0.0.37",
-    "@types/http-errors": "^1.6.1",
     "@types/json-query": "^2.2.0",
     "tslint": "^5.10.0",
     "tslint-config-origami": "^1.0.0",
