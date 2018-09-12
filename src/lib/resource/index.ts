@@ -1,22 +1,21 @@
 import {Origami, Route} from 'origami-core-lib';
 const pluralize = require('pluralize');
 
-// @ts-ignore
-// import {auth} from 'origami-plugin-auth';
-
 export type methods = 'get' | 'head' | 'post' | 'put' | 'delete' | 'list';
 export type controllers = 'list' | 'create' | 'get' | 'update' | 'delete';
 
 export interface ResourceOptions {
     model: Origami.Store.Schema;
     auth?: boolean | {
-        [key in methods]: boolean
+        [key in controllers]: boolean
     };
     controllers?: {
         [key in controllers]?: Origami.Server.RequestHandler
     };
 }
 
+const MW_SKIP: Origami.Server.RequestHandler = (req, res, next) => next();
+const MW_AUTH = 'auth';
 
 export default class Resource {
     resourcePlural: string;
@@ -28,7 +27,6 @@ export default class Resource {
         this.resourcePlural = pluralize(resource);
         this.resource = pluralize.singular(resource);
 
-
         this.router = new Route(`/api/v1/${this.resourcePlural}`)
             .position('store');
         this.subRouter = this.router.route(`/:${this.resource}Id`)
@@ -38,19 +36,21 @@ export default class Resource {
         (['get', 'post'] as methods[]).forEach(m => {
             const rMethod = this.router[m as keyof Route] as Function;
             let cMethod = this[m as keyof Resource] as Function;
+            let auth: Origami.Server.RequestHandler | string = options.auth ? MW_SKIP : MW_SKIP;
 
-            if (options.controllers) {
-                switch (m) {
-                    case 'get':
-                        cMethod = options.controllers['list'] || cMethod;
-                        break;
-                    case 'post':
-                        cMethod = options.controllers['create'] || cMethod;
-                }
+            switch (m) {
+                case 'get':
+                    if (options.controllers) cMethod = options.controllers['list'] || cMethod;
+                    auth = this._auth('list');
+                    break;
+                case 'post':
+                    if (options.controllers) cMethod = options.controllers['create'] || cMethod;
+                    auth = this._auth('create');
+                    break;
             }
 
             rMethod.bind(this.router)(
-                this._auth.bind(this),
+                auth,
                 cMethod.bind(this)
             );
         });
@@ -58,21 +58,26 @@ export default class Resource {
         (['get', 'delete', 'put'] as methods[]).forEach(m => {
             const rMethod = this.subRouter[m as keyof Route] as Function;
             let cMethod = this[m as keyof Resource] as Function;
+            let auth: Origami.Server.RequestHandler | string = MW_AUTH;
 
-            if (options.controllers) {
-                switch (m) {
-                    case 'get':
-                        cMethod = options.controllers['get'] || cMethod;
-                        break;
-                    case 'put':
-                        cMethod = options.controllers['update'] || cMethod;
-                    case 'delete':
-                        cMethod = options.controllers['delete'] || cMethod;
-                }
+            switch (m) {
+                case 'get':
+                    if (options.controllers) cMethod = options.controllers['get'] || cMethod;
+                    auth = this._auth('get');
+                    break;
+                case 'put':
+                    if (options.controllers) cMethod = options.controllers['update'] || cMethod;
+                    auth = this._auth('update');
+                    break;
+                case 'delete':
+                    if (options.controllers) cMethod = options.controllers['delete'] || cMethod;
+                    auth = this._auth('delete');
+                    break;
             }
 
+
             rMethod.bind(this.subRouter)(
-                this._auth.bind(this),
+                auth,
                 cMethod.bind(this)
             );
         });
@@ -183,29 +188,13 @@ export default class Resource {
     }
 
 
-    private _auth(
-        req: Origami.Server.Request,
-        res: Origami.Server.Response,
-        next: Origami.Server.NextFunction
-    ) {
-        let useAuth = null;
-        const m = req.method.toLowerCase() as methods;
-
+    private _auth(type: controllers) {
         if (this.options.auth) {
-            if (this.options.auth === true) {
-                useAuth = true;
+            if (this.options.auth === true) return MW_AUTH;
+            return this.options.auth[type] === false ? MW_SKIP : MW_AUTH;
+        }
+        if (this.options.auth === false) return MW_SKIP;
 
-            } else {
-                let set = this.options.auth[m];
-                if (!this.id(req) && m === 'get') set = this.options.auth['list'];
-
-                if (set || set === false) useAuth = set;
-            }
-        } else if (this.options.auth === false) useAuth = false;
-
-
-        // if (useAuth === null || useAuth) return auth(req, res, next);
-        if (useAuth === null || useAuth) return 'auth';
-        next() ;
+        return MW_AUTH;
     }
 }
