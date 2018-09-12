@@ -7,9 +7,8 @@ import upload from 'express-fileupload';
 import staticGzip from 'express-static-gzip';
 import helmet from 'helmet';
 import {Http2Server} from 'http2';
-import {error, Origami, requireKeys, requireLib, Route, RouterListItem, success} from 'origami-core-lib';
+import {error, info, Origami, requireKeys, requireLib, Route, RouterListItem, success} from 'origami-core-lib';
 import path from 'path';
-import defaultPlugins from './defaultPlugins';
 import App from './lib/app';
 import Resource, {ResourceOptions} from './lib/resource';
 import mwErrors from './middleware/errors';
@@ -156,11 +155,12 @@ export default class Server {
     }
 
 
-    async plugin(name: string, settings: boolean | object) {
+    async plugin(name: string, settings: boolean | object, p: string = __dirname) {
         if (Boolean(settings)) {
+            info('Server', 'Initializing plugin', name);
             let plugin;
 
-            plugin = await requireLib(name, __dirname, 'origami-plugin-');
+            plugin = await requireLib(name, p, 'origami-plugin-');
 
             if (!plugin) return error(new Error(`Could not load plugin ${name}`));
             if (typeof plugin !== 'function') {
@@ -212,10 +212,6 @@ export default class Server {
     private async _setup() {
         // Setup the store
         if (this.store) this.app.set('store', this.store);
-
-
-        // Setup the default plugins
-        await this._setupDefaultPlugins();
 
 
         this.app.use(upload());
@@ -277,13 +273,6 @@ export default class Server {
                 s.forEach(_s => this.static(path.resolve(process.cwd(), _s)));
             }
         }
-    }
-
-
-    private async _setupDefaultPlugins() {
-        Object.entries(defaultPlugins).forEach(async ([name, settings]) => {
-            await this.plugin(name, settings);
-        });
     }
 
 
