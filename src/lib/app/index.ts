@@ -88,6 +88,7 @@ export default class App {
         ['pages', 'scripts'].forEach(dir => this.router!
             .route(`/${dir}`)
             // TODO: convert to gzip serve
+            // @ts-ignore
             .use(express.static(path.resolve(this._dir as string, dir)))
         );
 

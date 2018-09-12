@@ -2,7 +2,7 @@ import {Origami, Route} from 'origami-core-lib';
 const pluralize = require('pluralize');
 
 // @ts-ignore
-import {auth} from 'origami-plugin-auth';
+// import {auth} from 'origami-plugin-auth';
 
 export type methods = 'get' | 'head' | 'post' | 'put' | 'delete' | 'list';
 export type controllers = 'list' | 'create' | 'get' | 'update' | 'delete';
@@ -204,7 +204,8 @@ export default class Resource {
         } else if (this.options.auth === false) useAuth = false;
 
 
-        if (useAuth === null || useAuth) return auth(req, res, next);
+        // if (useAuth === null || useAuth) return auth(req, res, next);
+        if (useAuth === null || useAuth) return 'auth';
         next() ;
     }
 }
