@@ -17,6 +17,7 @@ export default (): RequestHandler => {
         next: NextFunction
     ) => {
         await next();
+
         if (res.headersSent) return;
         if (res.responseCode) status(res, res.responseCode, http.OK);
 
@@ -25,10 +26,11 @@ export default (): RequestHandler => {
         // If it's a json request, wrap the data as json
         // NOTE: Attempted req.is(), however there seemed to be a bug
         if (
-            req.headers['content-type'] === 'application/json' ||
-            req.path.indexOf('/api') === 0 ||
+            req.accepts('application/json') ||
+            req.originalUrl.startsWith('/api') ||
             res.data && !res.body
         ) {
+
             const returning: Returning = {
                 statusCode: res.statusCode,
             };

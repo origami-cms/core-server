@@ -56,7 +56,7 @@ export default class App {
 
     // Load the app's manifest file, and throw error if there is none
     private async _loadManifest() {
-        const location = [`${this.name}/manifest.js`, process.cwd(), 'origami-app-'];
+        const location = [`${this.name}/origami.app`, process.cwd(), 'origami-app-'];
         const manifest: Origami.AppManifest = await requireLib.apply(this, location);
 
         if (!manifest) return error(new Error(`Could not load app ${this.name}`));
