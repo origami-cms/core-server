@@ -169,9 +169,17 @@ export default class Resource {
     ) {
         try {
             const {model, resourceId} = await this._getModel(req, res);
-            await model.delete(resourceId);
-            res.responseCode = 'resource.success.deleted';
-            delete res.data;
+
+            try {
+                await model.delete(resourceId);
+                res.responseCode = 'resource.success.deleted';
+                delete res.data;
+            } catch (e) {
+                const [data] = e.data;
+                if (data.rule === 'notFoundID' || data.rule === 'notFound') {
+                    res.responseCode = 'resource.errors.notFound';
+                }
+            }
         } catch (e) {
             if (next) return next(e);
             throw e;
