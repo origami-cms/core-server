@@ -7,18 +7,9 @@ import upload from 'express-fileupload';
 import staticGzip from 'express-static-gzip';
 import helmet from 'helmet';
 import {Http2Server} from 'http2';
-import {
-    error,
-    info,
-    Origami,
-    requireKeys,
-    requireLib,
-    Route,
-    RouterListItem,
-    success
-} from 'origami-core-lib';
+import {error, info, Origami, requireKeys, requireLib, Route, RouterListItem, success} from 'origami-core-lib';
 import path from 'path';
-import App from './lib/app';
+import {App} from './lib/app';
 import Resource, {ResourceOptions} from './lib/resource';
 import mwErrors from './middleware/errors';
 import mwFormat from './middleware/format';
@@ -33,10 +24,11 @@ type positionRouters = {
 const DEFAULT_PORT = 8080;
 
 export {lib} from './lib';
+export * from './lib/app';
 export default class Server {
     app: Application;
     store?: any;
-    apps: {[name: string]: Origami.AppManifest} = {};
+    apps: {[name: string]: App} = {};
 
     private _positions: Origami.Server.Position[];
     private _positionRouters: positionRouters;
@@ -185,7 +177,7 @@ export default class Server {
 
     async application(name: string, settings: boolean | object) {
         if (Boolean(settings)) {
-            const app = new App(name, this, settings);
+            const app = new App.App(name, this, settings);
             await app.setup();
         }
     }
