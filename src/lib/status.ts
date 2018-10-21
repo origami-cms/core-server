@@ -12,17 +12,20 @@ import query from 'json-query';
  * @return The message object
  */
 export default (res: Origami.Server.Response, message: string, code: number): string => {
-    const ln = statuses(res.app.get('ln'));
-    let m = query(message, {data: ln}).value;
-    let c = code;
+    if (message) {
+        const ln = statuses(res.app.get('ln'));
+        let m = query(message, {data: ln}).value;
+        let c = code;
 
-    // Destructure the code and message from an array
-    // EG: notFound: ['No resource found', 404]
-    if (m instanceof Array) [m, c] = m;
-    if (!m) m = 'Unknown error';
+        // Destructure the code and message from an array
+        // EG: notFound: ['No resource found', 404]
+        if (m instanceof Array) [m, c] = m;
+        if (!m) m = 'Unknown error';
 
-    res.status(c);
-    res.text = m;
+        res.status(c);
+        res.text = m;
+        return m;
+    }
 
-    return m;
+    return 'Unknown error';
 };
