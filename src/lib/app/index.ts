@@ -19,7 +19,7 @@ export namespace App {
 
     export class App {
         manifest?: Origami.AppManifest;
-        entry?: EntryResponse;
+        entry: EntryResponse | false = false;
         router?: Route;
 
         private _prefix = '/api/v1/apps/';
@@ -150,7 +150,7 @@ export namespace App {
             // Setup basic route for retrieving the manifest
             // EG: GET /api/v1/apps/:appName
             this.router!.get('auth', (req, res, next) => {
-                res.data = this.entry;
+                if (this.entry) res.data = this.entry;
                 next();
             });
 

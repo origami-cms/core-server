@@ -28,7 +28,7 @@ export * from './lib/app';
 export default class Server {
     app: Application;
     store?: any;
-    apps: {[name: string]: App} = {};
+    apps: {[name: string]: App.App} = {};
 
     private _positions: Origami.Server.Position[];
     private _positionRouters: positionRouters;
