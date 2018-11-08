@@ -7,7 +7,7 @@
 
 The Origami team and community take all security bugs in Origami seriously. Thank you for improving the security of Origami. We appreciate your efforts and responsible disclosure and will make every effort to acknowledge your contributions.
 
-Report security bugs by emailing the lead maintainer at [EMAIL ADDRESS] and include the word "SECURITY" in the subject line..
+Report security bugs by emailing the lead maintainer at tristan@origami.so and include the word "SECURITY" in the subject line..
 
 The lead maintainer will acknowledge your email within a week, and will send a more detailed response 48 hours after that indicating the next steps in handling your report. After the initial reply to your report, the security team will endeavor to keep you informed of the progress towards a fix and full announcement, and may ask for additional information or guidance.
 
@@ -22,7 +22,7 @@ Report security bugs in third-party modules to the person or team maintaining th
 *Your responsibility is to report vulnerabilities to us using the guidelines outlined below.*
 
 Discuss how someone should disclose a vulnerability to Origami, in tl;dr ( or ELI5 ) language. Then expand on this with "How To Disclose a vulnerability in detail". Please give detailed steps on how to disclose the vulnerability. Keep these OWASP guidelines in mind ( https://www.owasp.org/index.php/Vulnerability_Disclosure_Cheat_Sheet ) when creating your disclosure policy. Below are some recommendations for security disclosures:
-- Origami security contact { contact: mailto:[EMAIL ADDRESS] }
+- Origami security contact { contact: mailto:tristan@origami.so }
 - Disclosure format: When disclosing vulnerabilities please 
   1. Your name and affiliation (if any).
   2. include scope of vulnerability. Let us know who could use this exploit.
