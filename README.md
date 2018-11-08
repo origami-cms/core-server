@@ -1,11 +1,10 @@
 # "origami-core-server"
-
 [![npm version](https://badge.fury.io/js/origami-core-server.svg)](https://badge.fury.io/js/origami-core-server)
 
 ## Getting Started
-
-- [origami-cms](http://www.origamicms.com/) home page.
-- Generate an origami-cms website with [Origami CLI](https://github.com/origami-cms/cli).
+- [Origami Documentation](http://docs.origami.so/docs/tutorials/getting-started)
+- [Origami CLI](https://github.com/origami-cms/cli) used to automatically generate Origami sites.
+- [Todo App](http://docs.origami.so/docs/tutorials/todo-app-chapter-1) tutorial. Easily create app with Origami.
 
 ## What origami-core-server does?
 
